@@ -1,7 +1,8 @@
 ---
-- name: Check if any Ruby version is installed
-  command: rbenv versions
-  register: ruby_versions
+- name: Make sure rbenv is installed
+  homebrew:
+    name: rbenv
+    state: present
 
 - name: Install latest Ruby version via rbenv
   shell: |
@@ -9,4 +10,3 @@
     rbenv install "${LATEST_RUBY_VERSION}"
     rbenv global "${LATEST_RUBY_VERSION}"
     rbenv rehash
-  when: ruby_versions.stdout == "system"
