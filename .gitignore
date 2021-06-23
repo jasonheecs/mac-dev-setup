@@ -1,0 +1,5 @@
+.vagrant
+/config.yml
+vault
+vault.yml
+.vault_pass

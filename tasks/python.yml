@@ -1,0 +1,12 @@
+---
+- name: Check if any Python version is installed
+  command: pyenv versions
+  register: python_versions
+
+- name: Install latest Python version via pyenv
+  shell: |
+    LATEST_PYTHON_VERSION="$(pyenv install -l | grep -v - | tail -1 | tr -d '[:space:]')"
+    pyenv install "${LATEST_PYTHON_VERSION}"
+    pyenv global "${LATEST_PYTHON_VERSION}"
+    pyenv rehash
+  when: python_versions.stdout == "system"

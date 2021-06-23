@@ -1,0 +1,8 @@
+---
+roles:
+  - name: elliotweiser.osx-command-line-tools
+  - name: morgangraphics.ansible_role_nvm
+  - name: geerlingguy.dotfiles
+
+collections:
+  - name: geerlingguy.mac

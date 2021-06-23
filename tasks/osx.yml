@@ -1,0 +1,19 @@
+---
+- name: Set .osx file path variable
+  set_fact:
+    osx_file_path: "{{ dotfiles_repo_local_destination }}/.osx"
+
+- name: Check that the .osx file exists
+  stat:
+    path: "{{ osx_file_path }}"
+  register: osx_stat
+
+- name: Ensuring execution permissions for .osx file
+  file: dest="{{ osx_file_path }}" mode=a+x
+  when: osx_stat.stat.exists
+
+- name: Run .osx dotfile
+  command: "{{ osx_file_path }} --no-restart"
+  changed_when: false
+  become: true
+  when: osx_stat.stat.exists

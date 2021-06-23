@@ -1,0 +1,73 @@
+# dotfiles configuration
+configure_dotfiles: true
+dotfiles_repo: "https://github.com/jasonheecs/dotfiles.git"
+dotfiles_repo_version: master
+dotfiles_repo_local_destination: "~/.dotfiles"
+dotfiles_files:
+  - .gitaliases
+  - .gitconfig
+  - .gitignore
+  - .vimrc
+  - .zshrc
+
+## Homebrew configuration
+homebrew_installed_packages:
+  - autoconf
+  - awscli
+  - coreutils
+  - findutils
+  - gettext
+  - hadolint
+  - heroku
+  - httpie
+  - imagemagick
+  - mariadb
+  - postgresql
+  - php
+  - pyenv
+  - rbenv
+  - ruby-build
+  - shellcheck
+  - sqlite
+  - tmux
+  - tree
+  - vim
+  - webpack
+  - wget
+  - zsh-autosuggestions
+
+homebrew_taps:
+  - homebrew/core
+  - homebrew/cask
+  - homebrew/cask-versions
+  - heroku/brew
+
+homebrew_cask_appdir: /Applications
+homebrew_cask_apps:
+  - docker
+  - google-chrome
+  - iterm2
+  - jetbrains-toolbox
+  - macs-fan-control
+  - ngrok
+  - notion
+  - sublime-text
+  - vagrant
+  - zoom
+
+# Mac App Store apps configuration
+mas_installed_apps: []
+mas_email: ""
+mas_password: ""
+
+# Iterm2 configuration
+configure_iterm2: true
+iterm2_fonts: 
+  - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20for%20Powerline.ttf?raw=true
+  - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20Medium%20for%20Powerline.ttf?raw=true
+  - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20Thin%20for%20Powerline.ttf?raw=true
+  - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20Light%20for%20Powerline.ttf?raw=true
+iterm2_preferences_destination: ~/iTerm2
+
+# Glob pattern to ansible task files to run after all other tasks are finished.
+post_provision_tasks: []
