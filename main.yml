@@ -33,9 +33,11 @@
 
   tasks:
     - import_tasks: tasks/ruby.yml
+      when: configure_ruby
       tags: ['ruby']
 
     - import_tasks: tasks/python.yml
+      when: configure_python
       tags: ['python']
 
     - import_tasks: tasks/osx.yml

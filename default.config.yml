@@ -1,5 +1,9 @@
-# dotfiles configuration
 configure_dotfiles: true
+configure_ruby: true
+configure_python: true
+configure_iterm2: true
+
+# dotfiles configuration
 dotfiles_repo: "https://github.com/jasonheecs/dotfiles.git"
 dotfiles_repo_version: master
 dotfiles_repo_local_destination: "~/.dotfiles"
@@ -63,7 +67,6 @@ mas_password: ""
 oh_my_zsh_theme: agnoster
 
 # Iterm2 configuration
-configure_iterm2: true
 iterm2_fonts: 
   - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20for%20Powerline.ttf?raw=true
   - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20Medium%20for%20Powerline.ttf?raw=true
