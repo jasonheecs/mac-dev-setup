@@ -2,8 +2,7 @@ Vagrant.configure("2") do |config|
     config.vm.define "macosx-test"
     config.vm.box = "yzgyyang/macOS-10.14"
 
-    config.vm.synced_folder ".", "/Users/vagrant", type: "rsync",
-        rsync__exclude: ['.vagrant/', '.vault_pass']
+    config.vm.synced_folder ".", "/vagrant", disabled: true
 
     config.vm.provider :virtualbox do |vb|
         vb.name = "macosx-test"
@@ -41,6 +40,11 @@ Vagrant.configure("2") do |config|
     # Uninstall the Homebrew that is in the VM before attempting setup
     config.vm.provision "Uninstall Homebrew", type:"shell",
         inline: $uninstall_homebrew
+
+    # Upload ansible playbook from host to guest
+    Dir.glob('**/*') do |filename|
+        config.vm.provision "file", source: filename, destination: filename
+    end
 
     config.vm.provision "Run Setup", type:"shell",
         env: {"IN_VAGRANT" => "true"},
