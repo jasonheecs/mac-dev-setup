@@ -3,7 +3,7 @@ configure_ruby: true
 configure_python: true
 configure_iterm2: true
 
-nvm_profile: '~/.zprofile'
+nvm_profile: '~/.zshrc'
 
 # dotfiles configuration
 dotfiles_repo: "https://github.com/jasonheecs/dotfiles.git"
