@@ -12,12 +12,12 @@ install_homebrew() {
 }
 
 setup_pyenv() {
-	LATEST_PYTHON_VERSION="$(pyenv install --list | grep -v - | grep -v b | tail -1 | tr -d '[:space:]')"
-	pyenv install "${LATEST_PYTHON_VERSION}"
-	pyenv global "${LATEST_PYTHON_VERSION}"
-	pyenv rehash
-	echo 'eval "$(pyenv init --path)"' >> ~/.bashrc
-	source ~/.bashrc
+	if test ! "$(which pyenv)"; then
+		LATEST_PYTHON_VERSION="$(pyenv install --list | grep -v - | grep -v b | tail -1 | tr -d '[:space:]')"
+		pyenv install "${LATEST_PYTHON_VERSION}"
+		pyenv global "${LATEST_PYTHON_VERSION}"
+		pyenv rehash
+	fi
 }
 
 install_ansible() {
@@ -27,6 +27,8 @@ install_ansible() {
 
 install_homebrew
 setup_pyenv
+echo 'eval "$(pyenv init --path)"' >> ~/.bashrc
+source ~/.bashrc
 python --version
 
 # Run main ansible playbook
