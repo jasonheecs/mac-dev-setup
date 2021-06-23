@@ -22,13 +22,20 @@ install_ansible() {
 	pip install ansible
 }
 
-source ~/.bashrc
+function source_if_exists()
+{
+    if [[ -r $1 ]]; then
+        source $1
+    fi
+}
+
+source_if_exists ~/.zprofile
 install_homebrew
 setup_pyenv
-if test ! "$(which pyenv)"; then
-    echo 'eval "$(pyenv init --path)"' >> ~/.bashrc
-end
-source ~/.bashrc
+if test ! -f ~/.zprofile; then
+    echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
+fi
+source ~/.zprofile
 python --version
 
 # Run main ansible playbook
