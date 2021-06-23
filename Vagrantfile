@@ -2,13 +2,14 @@ Vagrant.configure("2") do |config|
     config.vm.define "macosx-test"
     config.vm.box = "yzgyyang/macOS-10.14"
 
-    config.vm.synced_folder ".", "/vagrant", :disabled => true
+    config.vm.synced_folder ".", "/Users/vagrant", type: "rsync",
+        rsync__exclude: ['.vagrant/', '.vault_pass']
 
     config.vm.provider :virtualbox do |vb|
         vb.name = "macosx-test"
         vb.memory = 4096
         vb.cpus = 2
-        # vb.gui = true
+        vb.gui = false
 
         # Disable USB 3.0
         vb.customize ["modifyvm", :id, "--usb", "on"]
@@ -40,9 +41,6 @@ Vagrant.configure("2") do |config|
     # Uninstall the Homebrew that is in the VM before attempting setup
     config.vm.provision "Uninstall Homebrew", type:"shell",
         inline: $uninstall_homebrew
-
-    # Upload ansible playbook from host to guest
-    config.vm.provision "file", source: "./", destination: "."
 
     config.vm.provision "Run Setup", type:"shell",
         env: {"IN_VAGRANT" => "true"},
