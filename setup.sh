@@ -22,10 +22,12 @@ install_ansible() {
 	pip install ansible
 }
 
-
+source ~/.bashrc
 install_homebrew
 setup_pyenv
-echo 'eval "$(pyenv init --path)"' >> ~/.bashrc
+if test ! "$(which pyenv)"; then
+    echo 'eval "$(pyenv init --path)"' >> ~/.bashrc
+end
 source ~/.bashrc
 python --version
 
