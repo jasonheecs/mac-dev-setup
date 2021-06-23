@@ -1,7 +1,8 @@
 ---
-- name: Check if any Python version is installed
-  command: pyenv versions
-  register: python_versions
+- name: Make sure pyenv is installed
+  homebrew:
+    name: pyenv
+    state: present
 
 - name: Install latest Python version via pyenv
   shell: |
@@ -9,4 +10,3 @@
     pyenv install "${LATEST_PYTHON_VERSION}"
     pyenv global "${LATEST_PYTHON_VERSION}"
     pyenv rehash
-  when: python_versions.stdout == "system"
