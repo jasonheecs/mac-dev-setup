@@ -1,13 +1,18 @@
 ---
-- name: Ensure iTerm2 is installed
+- name: Ensure iterm2 is installed
   stat:
     path: "/Applications/iTerm.app"
   register: iterm2_stat
 
-- name: Copy iTerm2 preferences file
+- name: Ensure iterm2 preferences folder exists
+  file:
+    path: "{{ iterm2_preferences_destination }}"
+    state: directory
+
+- name: Copy iterm2 preferences file
   copy:
     src: "{{ playbook_dir }}/files/iterm2/com.googlecode.iterm2.plist"
-    dest: "{{ iterm2_preferences_destination }}"
+    dest: "{{ iterm2_preferences_destination }}/com.googlecode.iterm2.plist"
   when: iterm2_stat.stat.exists
 
 - name: Ensure fonts are installed.

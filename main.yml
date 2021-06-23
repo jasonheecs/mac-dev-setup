@@ -53,3 +53,9 @@
         loop_var: outer_item
       with_fileglob: "{{ post_provision_tasks|default(omit) }}"
       tags: ['post']
+
+  post_tasks:
+    - name: Fix permission issues with ZSH's compinit
+      shell: compaudit | xargs chmod g-w
+      when: ansible_env['SHELL'] == '/bin/zsh'
+      tags: ['post']

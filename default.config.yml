@@ -75,7 +75,7 @@ iterm2_fonts:
   - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20Medium%20for%20Powerline.ttf?raw=true
   - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20Thin%20for%20Powerline.ttf?raw=true
   - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20Light%20for%20Powerline.ttf?raw=true
-iterm2_preferences_destination: ~/iTerm2
+iterm2_preferences_destination: ~/iterm2
 
 # Glob pattern to ansible task files to run after all other tasks are finished.
 post_provision_tasks: []
