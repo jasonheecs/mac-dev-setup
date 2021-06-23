@@ -2,6 +2,7 @@
 homebrew_installed_packages:
   - pyenv
   - rbenv
+  - ruby-build
   - php
   - wget
 

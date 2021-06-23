@@ -4,6 +4,11 @@
     name: rbenv
     state: present
 
+- name: Make sure ruby-build is installed
+  homebrew:
+    name: ruby-build
+    state: present
+
 - name: Install latest Ruby version via rbenv
   shell: |
     LATEST_RUBY_VERSION="$(rbenv install -l | grep -v - | tail -1 | tr -d '[:space:]')"
