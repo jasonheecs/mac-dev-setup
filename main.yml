@@ -24,6 +24,9 @@
     - role: geerlingguy.mac.mas
       when: mas_installed_apps or mas_installed_app_ids
       tags: ['mas']
+    - role: gantsign.oh-my-zsh
+      users:
+        - username: "{{ ansible_user_id }}"
     - role: geerlingguy.dotfiles
       when: configure_dotfiles
       tags: ['dotfiles']

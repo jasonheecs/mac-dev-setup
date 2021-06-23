@@ -60,6 +60,8 @@ mas_installed_apps: []
 mas_email: ""
 mas_password: ""
 
+oh_my_zsh_theme: agnoster
+
 # Iterm2 configuration
 configure_iterm2: true
 iterm2_fonts: 

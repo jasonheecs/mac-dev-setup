@@ -5,6 +5,7 @@ roles:
     src: https://github.com/morgangraphics/ansible-role-nvm
     version: e6660522f1fe0efe31328d351a24ac9d5635a7ec
   - name: geerlingguy.dotfiles
+  - name: gantsign.oh-my-zsh
 
 collections:
   - name: geerlingguy.mac
