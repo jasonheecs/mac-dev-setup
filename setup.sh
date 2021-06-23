@@ -12,12 +12,10 @@ install_homebrew() {
 }
 
 setup_pyenv() {
-	if test ! "$(which pyenv)"; then
-		LATEST_PYTHON_VERSION="$(pyenv install --list | grep -v - | grep -v b | tail -1 | tr -d '[:space:]')"
-		pyenv install "${LATEST_PYTHON_VERSION}"
-		pyenv global "${LATEST_PYTHON_VERSION}"
-		pyenv rehash
-	fi
+	LATEST_PYTHON_VERSION="$(pyenv install --list | grep -v - | grep -v b | tail -1 | tr -d '[:space:]')"
+	pyenv install "${LATEST_PYTHON_VERSION}"
+	pyenv global "${LATEST_PYTHON_VERSION}"
+	pyenv rehash
 }
 
 install_ansible() {
