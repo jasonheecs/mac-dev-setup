@@ -12,4 +12,4 @@ homebrew_taps:
 
 # homebrew_cask_appdir: /Applications
 homebrew_cask_apps:
-  - google-chrome
+  - iterm2
