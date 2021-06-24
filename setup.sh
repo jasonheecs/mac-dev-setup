@@ -6,16 +6,16 @@ install_homebrew() {
         echo "Installing homebrew..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     fi
-
-    brew install pyenv
-    brew cleanup
 }
 
 setup_pyenv() {
-	LATEST_PYTHON_VERSION="$(pyenv install --list | grep -v - | grep -v b | tail -1 | tr -d '[:space:]')"
-	pyenv install "${LATEST_PYTHON_VERSION}"
-	pyenv global "${LATEST_PYTHON_VERSION}"
-	pyenv rehash
+    if test ! "$(which pyenv)"; then
+        brew install pyenv
+    	LATEST_PYTHON_VERSION="$(pyenv install --list | grep -v - | grep -v b | tail -1 | tr -d '[:space:]')"
+    	pyenv install "${LATEST_PYTHON_VERSION}"
+    	pyenv global "${LATEST_PYTHON_VERSION}"
+    	pyenv rehash
+    fi
 }
 
 install_ansible() {
@@ -32,6 +32,7 @@ function source_if_exists()
 source_if_exists ~/.zprofile
 install_homebrew
 setup_pyenv
+brew cleanup
 if test ! -f ~/.zprofile; then
     echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
 fi
