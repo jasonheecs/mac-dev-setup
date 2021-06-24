@@ -48,7 +48,10 @@
       tags: ['iterm2']
 
     - name: Run configured post-provision ansible task files.
-      include_tasks: "{{ outer_item }}"
+      include_tasks: 
+        file: "{{ outer_item }}"
+        apply:
+          tags: ['post']
       loop_control:
         loop_var: outer_item
       with_fileglob: "{{ post_provision_tasks|default(omit) }}"
