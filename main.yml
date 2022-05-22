@@ -19,8 +19,6 @@
     - role: elliotweiser.osx-command-line-tools
     - role: geerlingguy.mac.homebrew
       tags: ['homebrew']
-    - role: morgangraphics.ansible_role_nvm
-      tags: ['nvm']
     - role: geerlingguy.mac.mas
       when: mas_installed_apps or mas_installed_app_ids
       tags: ['mas']
@@ -39,6 +37,10 @@
     - import_tasks: tasks/python.yml
       when: configure_python
       tags: ['python']
+
+    - import_tasks: tasks/node.yml
+      when: configure_node
+      tags: ['node']
 
     - import_tasks: tasks/osx.yml
       tags: ['osx']

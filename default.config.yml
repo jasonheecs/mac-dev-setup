@@ -1,9 +1,8 @@
 configure_dotfiles: true
 configure_ruby: true
 configure_python: true
+configure_node: true
 configure_iterm2: true
-
-nvm_profile: '~/.zshrc'
 
 # dotfiles configuration
 dotfiles_repo: "https://github.com/jasonheecs/dotfiles.git"
@@ -25,6 +24,7 @@ homebrew_installed_packages:
   - awscli
   - coreutils
   - findutils
+  - fnm
   - gettext
   - hadolint
   - heroku

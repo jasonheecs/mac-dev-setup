@@ -1,0 +1,12 @@
+---
+- name: Make sure fnm is installed
+  homebrew:
+    name: fnm
+    state: present
+
+- name: Install latest Node version via fnm
+  shell: |
+    LATEST_NODE_VERSION="$(fnm ls-remote | grep -v - | tail -1 | tr -d '[:space:]')"
+    fnm install "${LATEST_NODE_VERSION}"
+    fnm default "${LATEST_NODE_VERSION}"
+    rehash
