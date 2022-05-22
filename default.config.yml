@@ -21,35 +21,20 @@ dotfiles_files:
 ## Homebrew configuration
 homebrew_installed_packages:
   - autoconf
-  - awscli
-  - coreutils
-  - findutils
   - fnm
-  - gettext
-  - hadolint
-  - heroku
-  - httpie
-  - imagemagick
-  - mariadb
-  - postgresql
   - php
   - pyenv
   - rbenv
   - ruby-build
-  - shellcheck
-  - sqlite
   - tmux
-  - tree
   - vim
   - webpack
-  - wget
   - zsh-autosuggestions
 
 homebrew_taps:
   - homebrew/core
   - homebrew/cask
   - homebrew/cask-versions
-  - heroku/brew
 
 homebrew_cask_appdir: /Applications
 homebrew_cask_apps:
