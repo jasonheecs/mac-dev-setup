@@ -53,7 +53,6 @@ homebrew_taps:
 
 homebrew_cask_appdir: /Applications
 homebrew_cask_apps:
-  - docker
   - google-chrome
   - iterm2
   - jetbrains-toolbox
