@@ -55,14 +55,7 @@ homebrew_cask_appdir: /Applications
 homebrew_cask_apps:
   - google-chrome
   - iterm2
-  - jetbrains-toolbox
-  - macs-fan-control
-  - ngrok
-  - notion
-  - notunes
   - sublime-text
-  - vagrant
-  - zoom
 
 # Mac App Store apps configuration
 mas_installed_apps: []
