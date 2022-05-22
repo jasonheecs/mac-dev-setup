@@ -10,9 +10,11 @@ dotfiles_repo: "https://github.com/jasonheecs/dotfiles.git"
 dotfiles_repo_version: master
 dotfiles_repo_local_destination: "~/.dotfiles"
 dotfiles_files:
+  - .aliases
   - .gitaliases
   - .gitconfig
   - .gitignore
+  - .osx
   - .vimrc
   - .zprofile
   - .zshrc
