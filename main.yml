@@ -69,7 +69,19 @@
       tags: ['post']
 
   post_tasks:
-    - name: Fix permission issues with ZSH's compinit
-      shell: compaudit | xargs chmod g-w
-      when: ansible_env['SHELL'] == '/bin/zsh'
+    - name: Get list of directories with permission issues for ZSH compinit
+      shell: compaudit 2>/dev/null || true
+      register: compaudit_output
+      changed_when: false
+      failed_when: false
+      tags: ['post']
+
+    - name: Fix permission issues with ZSH compinit
+      file:
+        path: "{{ item }}"
+        mode: 'g-w'
+      loop: "{{ compaudit_output.stdout_lines | default([]) }}"
+      when:
+        - compaudit_output.stdout_lines is defined
+        - compaudit_output.stdout_lines | length > 0
       tags: ['post']
