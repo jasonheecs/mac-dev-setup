@@ -18,23 +18,16 @@ dotfiles_files:
   - .zprofile
   - .zshrc
 
-## Homebrew configuration
+# Homebrew configuration
 homebrew_installed_packages:
   - autoconf
   - fnm
-  - php
   - pyenv
   - rbenv
   - ruby-build
   - tmux
   - vim
-  - webpack
   - zsh-autosuggestions
-
-homebrew_taps:
-  - homebrew/core
-  - homebrew/cask
-  - homebrew/cask-versions
 
 homebrew_cask_appdir: /Applications
 homebrew_cask_apps:
