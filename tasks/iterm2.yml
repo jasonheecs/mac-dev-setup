@@ -8,26 +8,51 @@
   file:
     path: "{{ iterm2_preferences_destination }}"
     state: directory
+    mode: '0755'
+  when: 
+    - iterm2_stat.stat.exists
+    - iterm2_preferences_destination is defined
 
 - name: Copy iterm2 preferences file
   copy:
     src: "{{ playbook_dir }}/files/iterm2/com.googlecode.iterm2.plist"
     dest: "{{ iterm2_preferences_destination }}/com.googlecode.iterm2.plist"
+    mode: '0644'
+    force: false
   when: iterm2_stat.stat.exists
 
-- name: Ensure fonts are installed.
+- name: Ensure fonts are installed
   get_url:
     url: "{{ item }}"
-    dest: "~/Library/Fonts"
-  with_items: "{{ iterm2_fonts }}"
-  when: iterm2_fonts is defined
+    dest: "{{ ansible_env.HOME }}/Library/Fonts/{{ item | basename }}"
+    mode: '0644'
+  loop: "{{ iterm2_fonts }}"
+  when: 
+    - iterm2_stat.stat.exists
+    - iterm2_fonts is defined
+    - iterm2_fonts | length > 0
 
-- name: Ensure preferences are loaded from a custom folder.
-  command: "defaults write com.googlecode.iterm2 'PrefsCustomFolder' -string '{{ iterm2_preferences_destination }}'"
-  when: iterm2_preferences_destination is defined and iterm2_preferences_destination
+- name: Ensure preferences are loaded from a custom folder
+  community.general.osx_defaults:
+    domain: com.googlecode.iterm2
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    state: present
+  loop:
+    - { key: 'PrefsCustomFolder', type: 'string', value: "{{ iterm2_preferences_destination }}" }
+    - { key: 'LoadPrefsFromCustomFolder', type: 'bool', value: true }
+  when: 
+    - iterm2_stat.stat.exists
+    - iterm2_preferences_destination | default('') | length > 0
 
-- name: Ensure shell integration is installed.
+- name: Check if shell integration is already installed
+  stat:
+    path: "{{ ansible_env.HOME }}/.iterm2_shell_integration.zsh"
+  register: shell_integration
+
+- name: Ensure shell integration is installed
   shell: curl -L https://iterm2.com/misc/install_shell_integration.sh | bash
-  args:
-    warn: no
-  when: iterm2_stat.stat.exists
+  when: 
+    - iterm2_stat.stat.exists
+    - not shell_integration.stat.exists
