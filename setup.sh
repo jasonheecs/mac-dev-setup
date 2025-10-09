@@ -45,5 +45,5 @@ ansible-galaxy install -r requirements.yml
 if [[ "${IN_VAGRANT}" == "true" ]]; then
     ansible-playbook ./main.yml --extra-vars "ansible_become_pass=vagrant" -v
 else
-	ansible-playbook ./main.yml --ask-become-pass
+    ansible-playbook ./main.yml
 fi

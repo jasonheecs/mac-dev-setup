@@ -5,6 +5,10 @@
 
   vars_files: default.config.yml
 
+  vars_prompt:
+    - name: ansible_become_password
+      prompt: "BECOME password:"
+
   pre_tasks:
     - name: Include playbook configuration
       include_vars: "{{ item }}"
