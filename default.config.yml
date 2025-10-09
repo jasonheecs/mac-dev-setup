@@ -15,7 +15,6 @@ dotfiles_files:
   - .gitignore
   - .osx
   - .vimrc
-  - .zprofile
   - .zshrc
 
 # Homebrew configuration
