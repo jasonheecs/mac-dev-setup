@@ -14,8 +14,9 @@ install_homebrew() {
 
 setup_pyenv() {
     if test ! "$(which pyenv)"; then
+        echo "Setup PyEnv..."
         brew install pyenv
-    	LATEST_PYTHON_VERSION="$(pyenv install --list | grep -v - | grep -v b | tail -1 | tr -d '[:space:]')"
+        LATEST_PYTHON_VERSION="$(pyenv install -l | grep -E '^\s*[0-9]+\.[0-9]+\.[0-9]+$' | tail -1 | tr -d '[:space:]')"
     	pyenv install "${LATEST_PYTHON_VERSION}"
     	pyenv global "${LATEST_PYTHON_VERSION}"
     	pyenv rehash
