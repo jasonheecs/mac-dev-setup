@@ -35,37 +35,37 @@
         - username: "{{ ansible_user_id }}"
 
     - role: geerlingguy.dotfiles
-      when: configure_dotfiles
+      when: configure_dotfiles | default(false)
       tags: ['dotfiles']
 
   tasks:
     - import_tasks: tasks/ruby.yml
-      when: configure_ruby
+      when: configure_ruby | default(false)
       tags: ['ruby']
 
     - import_tasks: tasks/python.yml
-      when: configure_python
+      when: configure_python | default(false)
       tags: ['python']
 
     - import_tasks: tasks/node.yml
-      when: configure_node
+      when: configure_node | default(false)
       tags: ['node']
 
     - import_tasks: tasks/osx.yml
       tags: ['osx']
 
     - import_tasks: tasks/iterm2.yml
-      when: configure_iterm2
+      when: configure_iterm2 | default(false)
       tags: ['iterm2']
 
-    - name: Run configured post-provision ansible task files.
-      include_tasks: 
+    - name: Run configured post-provision ansible task files
+      include_tasks:
         file: "{{ outer_item }}"
         apply:
           tags: ['post']
+      with_fileglob: "{{ post_provision_tasks | default([]) }}"
       loop_control:
         loop_var: outer_item
-      with_fileglob: "{{ post_provision_tasks|default(omit) }}"
       tags: ['post']
 
   post_tasks:
