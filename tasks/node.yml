@@ -4,9 +4,29 @@
     name: fnm
     state: present
 
-- name: Install latest Node version via fnm
-  shell: |
-    LATEST_NODE_VERSION="$(fnm ls-remote | grep -v - | tail -1 | tr -d '[:space:]')"
-    fnm install "${LATEST_NODE_VERSION}"
-    fnm default "${LATEST_NODE_VERSION}"
-    rehash
+- name: Get latest LTS Node version
+  shell: fnm ls-remote | grep -E 'lts' | tail -1 | awk '{print $1}' | tr -d '[:space:]'
+  register: latest_lts_version
+  changed_when: false
+  environment:
+    PATH: "/opt/homebrew/bin:{{ ansible_env.PATH }}"
+
+- name: Get current default Node version
+  shell: fnm current
+  register: current_node_version
+  changed_when: false
+  failed_when: false
+  environment:
+    PATH: "/opt/homebrew/bin:{{ ansible_env.PATH }}"
+
+- name: Install latest LTS Node version via fnm
+  shell: fnm install --lts
+  when: current_node_version.stdout != latest_lts_version.stdout
+  environment:
+    PATH: "/opt/homebrew/bin:{{ ansible_env.PATH }}"
+
+- name: Set default to latest LTS
+  shell: fnm default lts-latest
+  when: current_node_version.stdout != latest_lts_version.stdout
+  environment:
+    PATH: "/opt/homebrew/bin:{{ ansible_env.PATH }}"
