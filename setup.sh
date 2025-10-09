@@ -27,6 +27,7 @@ setup_pyenv() {
 }
 
 install_ansible() {
+    echo "Installing Ansible..."
 	pip install ansible
 }
 
