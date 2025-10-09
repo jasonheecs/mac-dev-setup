@@ -4,9 +4,26 @@
     name: pyenv
     state: present
 
+- name: Get latest available stable Python version
+  shell: pyenv install -l | grep -E '^\s*[0-9]+\.[0-9]+\.[0-9]+$' | tail -1 | tr -d '[:space:]'
+  register: latest_python_version
+  changed_when: false
+
+- name: Get current global Python version
+  shell: pyenv global
+  register: current_python_version
+  changed_when: false
+  failed_when: false
+
 - name: Install latest Python version via pyenv
-  shell: |
-    LATEST_PYTHON_VERSION="$(pyenv install -l | grep -v - | tail -1 | tr -d '[:space:]')"
-    pyenv install "${LATEST_PYTHON_VERSION}"
-    pyenv global "${LATEST_PYTHON_VERSION}"
-    pyenv rehash
+  shell: pyenv install "{{ latest_python_version.stdout }}" --skip-existing
+  when: current_python_version.stdout != latest_python_version.stdout
+  register: python_install
+
+- name: Set global Python version to latest
+  shell: pyenv global "{{ latest_python_version.stdout }}"
+  when: current_python_version.stdout != latest_python_version.stdout
+
+- name: Rehash pyenv shims
+  shell: pyenv rehash
+  when: python_install is changed
