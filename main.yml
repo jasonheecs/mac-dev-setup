@@ -64,16 +64,6 @@
       when: configure_iterm2 | default(false)
       tags: ['iterm2']
 
-    - name: Run configured post-provision ansible task files
-      include_tasks:
-        file: "{{ outer_item }}"
-        apply:
-          tags: ['post']
-      with_fileglob: "{{ post_provision_tasks | default([]) }}"
-      loop_control:
-        loop_var: outer_item
-      tags: ['post']
-
   post_tasks:
     - name: Get list of directories with permission issues for ZSH compinit
       shell: compaudit 2>/dev/null || true
@@ -90,4 +80,14 @@
       when:
         - compaudit_output.stdout_lines is defined
         - compaudit_output.stdout_lines | length > 0
+      tags: ['post']
+
+    - name: Run configured post-provision ansible task files
+      include_tasks:
+        file: "{{ outer_item }}"
+        apply:
+          tags: ['post']
+      with_fileglob: "{{ post_provision_tasks | default([]) }}"
+      loop_control:
+        loop_var: outer_item
       tags: ['post']
