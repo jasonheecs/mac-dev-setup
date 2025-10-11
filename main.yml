@@ -3,7 +3,9 @@
   hosts: all
   become: false
 
-  vars_files: default.config.yml
+  vars_files: 
+    - default.config.yml
+    - vars/main.yml
 
   vars_prompt:
     - name: ansible_become_password
@@ -34,9 +36,9 @@
           (mas_installed_app_ids | default([]) | length > 0)
       tags: ['mas']
 
-    - role: gantsign.oh-my-zsh
-      users:
-        - username: "{{ ansible_user_id }}"
+    - role: oh-my-zsh
+      when: configure_ohmyzsh | default(false)
+      tags: ['ohmyzsh']
 
     - role: geerlingguy.dotfiles
       when: configure_dotfiles | default(false)
