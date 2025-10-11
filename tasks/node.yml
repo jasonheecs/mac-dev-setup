@@ -5,7 +5,7 @@
     state: present
 
 - name: Get latest LTS Node version
-  ansible.builtin.shell: fnm ls-remote | grep -E 'lts' | tail -1 | awk '{print $1}' | tr -d '[:space:]'
+  ansible.builtin.shell: fnm ls-remote --lts | tail -1 | awk '{print $1}'
   register: latest_lts_version
   changed_when: false
   environment:
