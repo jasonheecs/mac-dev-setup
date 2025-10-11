@@ -1,3 +1,4 @@
+---
 ## Homebrew configuration
 homebrew_installed_packages:
   - pyenv

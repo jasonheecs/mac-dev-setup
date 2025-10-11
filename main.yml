@@ -11,81 +11,81 @@
 
   pre_tasks:
     - name: Include playbook configuration
-      include_vars: "{{ item }}"
+      ansible.builtin.include_vars: "{{ item }}"
       with_fileglob:
         - "{{ playbook_dir }}/config.yml"
-      tags: ['always']
+      tags: ["always"]
 
     - name: Store non-root user home directory
-      set_fact:
+      ansible.builtin.set_fact:
         dotfiles_repo_local_destination: "{{ ansible_env.HOME }}{{ dotfiles_repo_local_destination | regex_replace('^~', '') }}"
       when: dotfiles_repo_local_destination is defined and dotfiles_repo_local_destination.startswith('~')
-      tags: ['always']
+      tags: ["always"]
 
   roles:
     - role: elliotweiser.osx-command-line-tools
 
     - role: geerlingguy.mac.homebrew
-      tags: ['homebrew']
+      tags: ["homebrew"]
 
     - role: geerlingguy.mac.mas
       when: >
-          (mas_installed_apps | default([]) | length > 0) or
-          (mas_installed_app_ids | default([]) | length > 0)
-      tags: ['mas']
+        (mas_installed_apps | default([]) | length > 0) or
+        (mas_installed_app_ids | default([]) | length > 0)
+      tags: ["mas"]
 
     - role: oh-my-zsh
       when: configure_ohmyzsh | default(false)
-      tags: ['ohmyzsh']
+      tags: ["ohmyzsh"]
 
     - role: geerlingguy.dotfiles
       when: configure_dotfiles | default(false)
-      tags: ['dotfiles']
+      tags: ["dotfiles"]
 
   tasks:
-    - import_tasks: tasks/ruby.yml
+    - ansible.builtin.import_tasks: tasks/ruby.yml
       when: configure_ruby | default(false)
-      tags: ['ruby']
+      tags: ["ruby"]
 
-    - import_tasks: tasks/python.yml
+    - ansible.builtin.import_tasks: tasks/python.yml
       when: configure_python | default(false)
-      tags: ['python']
+      tags: ["python"]
 
-    - import_tasks: tasks/node.yml
+    - ansible.builtin.import_tasks: tasks/node.yml
       when: configure_node | default(false)
-      tags: ['node']
+      tags: ["node"]
 
-    - import_tasks: tasks/osx.yml
-      tags: ['osx']
+    - ansible.builtin.import_tasks: tasks/osx.yml
+      tags: ["osx"]
 
-    - import_tasks: tasks/iterm2.yml
+    - ansible.builtin.import_tasks: tasks/iterm2.yml
       when: configure_iterm2 | default(false)
-      tags: ['iterm2']
-
-    - name: Run configured post-provision ansible task files
-      include_tasks:
-        file: "{{ outer_item }}"
-        apply:
-          tags: ['post']
-      with_fileglob: "{{ post_provision_tasks | default([]) }}"
-      loop_control:
-        loop_var: outer_item
-      tags: ['post']
+      tags: ["iterm2"]
 
   post_tasks:
     - name: Get list of directories with permission issues for ZSH compinit
-      shell: compaudit 2>/dev/null || true
+      ansible.builtin.shell: compaudit 2>/dev/null || true
       register: compaudit_output
       changed_when: false
       failed_when: false
-      tags: ['post']
+      tags: ["post"]
 
     - name: Fix permission issues with ZSH compinit
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
-        mode: 'g-w'
+        mode: "g-w"
       loop: "{{ compaudit_output.stdout_lines | default([]) }}"
       when:
         - compaudit_output.stdout_lines is defined
         - compaudit_output.stdout_lines | length > 0
-      tags: ['post']
+      tags: ["post"]
+
+    - name: Run configured post-provision ansible task files
+      ansible.builtin.include_tasks:
+        file: "{{ outer_item }}"
+        apply:
+          tags: ["post"]
+      with_fileglob: "{{ post_provision_tasks | default([]) }}"
+      loop_control:
+        loop_var: outer_item
+      tags: ["post"]

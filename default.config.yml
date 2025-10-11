@@ -1,3 +1,4 @@
+---
 configure_dotfiles: true
 configure_iterm2: true
 configure_ohmyzsh: true
@@ -43,7 +44,7 @@ mas_password: ""
 oh_my_zsh_theme: agnoster
 
 # Iterm2 configuration
-iterm2_fonts: 
+iterm2_fonts:
   - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20for%20Powerline.ttf?raw=true
   - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20Medium%20for%20Powerline.ttf?raw=true
   - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20Thin%20for%20Powerline.ttf?raw=true
