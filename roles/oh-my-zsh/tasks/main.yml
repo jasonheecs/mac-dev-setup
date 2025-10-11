@@ -1,0 +1,29 @@
+---
+- name: Install dependencies
+  become: "{{ ansible_facts.distribution != 'MacOSX' }}"
+  package:
+    name: '{{ oh_my_zsh_dependencies }}'
+    state: present
+
+- name: Clone oh-my-zsh
+  become: false
+  git:
+    repo: https://github.com/ohmyzsh/ohmyzsh.git
+    dest: '{{ ansible_env.HOME }}/.oh-my-zsh'
+    depth: 1
+    version: master
+    update: false
+  environment:
+    GIT_CONFIG_PARAMETERS: "'core.autocrlf=input'"
+
+- name: Set permissions of oh-my-zsh
+  file:
+    path: '{{ ansible_env.HOME }}/.oh-my-zsh'
+    mode: 'go-w'
+    recurse: true
+
+- name: Set default shell to zsh
+  become: true
+  user:
+    name: '{{ ansible_user_id }}'
+    shell: '{{ oh_my_zsh_zsh_path | default("/bin/zsh") }}'
