@@ -10,7 +10,9 @@
     state: present
 
 - name: Get latest available Ruby version
-  ansible.builtin.shell: rbenv install -l | grep -v - | tail -1 | tr -d '[:space:]'
+  ansible.builtin.shell: |
+    set -o pipefail
+    rbenv install -l | grep -v - | tail -1 | tr -d '[:space:]'
   register: latest_ruby_version
   changed_when: false
 
@@ -24,11 +26,14 @@
   ansible.builtin.command: rbenv install "{{ latest_ruby_version.stdout }}" --skip-existing
   when: current_ruby_version.stdout != latest_ruby_version.stdout
   register: ruby_install
+  changed_when: ruby_install.stdout | trim | length > 0
 
 - name: Set global Ruby version to latest
   ansible.builtin.command: rbenv global "{{ latest_ruby_version.stdout }}"
   when: current_ruby_version.stdout != latest_ruby_version.stdout
+  changed_when: true # Always changed when it runs (version is being switched)
 
 - name: Rehash rbenv shims
   ansible.builtin.command: rbenv rehash
   when: ruby_install is changed
+  changed_when: false

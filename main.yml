@@ -42,11 +42,11 @@
       when: configure_dotfiles | default(false)
       tags: ["dotfiles"]
 
-  tasks:
-    - ansible.builtin.import_tasks: tasks/ruby.yml
+    - role: ruby
       when: configure_ruby | default(false)
       tags: ["ruby"]
 
+  tasks:
     - ansible.builtin.import_tasks: tasks/python.yml
       when: configure_python | default(false)
       tags: ["python"]
