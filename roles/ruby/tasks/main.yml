@@ -27,13 +27,6 @@
   when: current_ruby_version.stdout != latest_ruby_version.stdout
   register: ruby_install
   changed_when: ruby_install.stdout | trim | length > 0
-
-- name: Set global Ruby version to latest
-  ansible.builtin.command: rbenv global "{{ latest_ruby_version.stdout }}"
-  when: current_ruby_version.stdout != latest_ruby_version.stdout
-  changed_when: true # Always changed when it runs (version is being switched)
-
-- name: Rehash rbenv shims
-  ansible.builtin.command: rbenv rehash
-  when: ruby_install is changed
-  changed_when: false
+  notify:
+    - Set global Ruby version to latest
+    - Rehash rbenv shims
