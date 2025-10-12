@@ -1,14 +1,45 @@
 #!/usr/bin/env bash
 
+function find_homebrew_bin() {
+    # Find homebrew
+    if [ -f "/opt/homebrew/bin/brew" ]; then
+        echo "/opt/homebrew/bin/brew"
+        return 0
+    elif [ -f "/usr/local/bin/brew" ]; then
+        echo "/usr/local/bin/brew"
+        return 0
+    else
+        # Homebrew not found
+        return 1
+    fi
+}
+
+function add_homebrew_path() {
+    local path=$1
+
+    # Add to .zprofile only if not already there
+    if ! grep -q "brew shellenv" ~/.zprofile 2>/dev/null; then
+        echo '' >> ~/.zprofile
+        echo "eval \"\$(${path} shellenv)\"" >> ~/.zprofile
+    fi
+
+    # Source for current shell
+    eval "$(${path} shellenv)"
+}
+
 install_homebrew() {
     # Check for Homebrew, install if we don't have it
     if test ! "$(which brew)"; then
         echo "Installing homebrew..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
-        echo >> ~/.zprofile
-        echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
-        eval "$(/usr/local/bin/brew shellenv)"
+        local homebrew_bin
+        if homebrew_bin=$(find_homebrew_bin); then
+            add_homebrew_path "${homebrew_bin}"
+        else
+            echo "Error: Homebrew installation failed or not found"
+            return 1
+        fi
     fi
 }
 
