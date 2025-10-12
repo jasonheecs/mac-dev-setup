@@ -34,7 +34,7 @@
         (mas_installed_app_ids | default([]) | length > 0)
       tags: ["mas"]
 
-    - role: oh-my-zsh
+    - role: oh_my_zsh
       when: configure_ohmyzsh | default(false)
       tags: ["ohmyzsh"]
 
