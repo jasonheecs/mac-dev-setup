@@ -21,11 +21,12 @@ dotfiles_files:
 
 # Homebrew configuration
 homebrew_installed_packages:
-  - autoconf
   - fnm
+  - php
   - pyenv
   - rbenv
   - ruby-build
+  - sqlite
   - tmux
   - vim
   - zsh-autosuggestions
