@@ -7,7 +7,7 @@
 
   vars_prompt:
     - name: ansible_become_password
-      prompt: "BECOME password:"
+      prompt: "BECOME password"
 
   pre_tasks:
     - name: Include playbook configuration
@@ -19,8 +19,8 @@
     - name: Store non-root user home directory
       ansible.builtin.set_fact:
         dotfiles_repo_local_destination: >-
-          {{ ansible_env.HOME }}
-          {{ dotfiles_repo_local_destination | regex_replace('^~', '') }}
+          {{ ansible_env.HOME }}{{
+          dotfiles_repo_local_destination | regex_replace('^~', '') }}
       when:
         - dotfiles_repo_local_destination is defined
         - dotfiles_repo_local_destination.startswith('~')
