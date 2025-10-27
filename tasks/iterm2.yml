@@ -40,8 +40,12 @@
     value: "{{ item.value }}"
     state: present
   loop:
-    - { key: "PrefsCustomFolder", type: "string", value: "{{ iterm2_preferences_destination }}" }
-    - { key: "LoadPrefsFromCustomFolder", type: "bool", value: true }
+    - key: "PrefsCustomFolder"
+      type: "string"
+      value: "{{ iterm2_preferences_destination }}"
+    - key: "LoadPrefsFromCustomFolder"
+      type: "bool"
+      value: true
   when:
     - iterm2_stat.stat.exists
     - iterm2_preferences_destination | default('') | length > 0

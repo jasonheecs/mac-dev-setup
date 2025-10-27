@@ -1,7 +1,7 @@
 ---
 - name: Set global Ruby version to latest
   ansible.builtin.command: rbenv global "{{ latest_ruby_version.stdout }}"
-  changed_when: true # Always changed when it runs (version is being switched)
+  changed_when: true  # Always changed when it runs (version is being switched)
 
 - name: Rehash rbenv shims
   ansible.builtin.command: rbenv rehash
