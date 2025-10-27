@@ -1,11 +1,11 @@
 ---
 - name: Make sure rbenv is installed
-  homebrew:
+  community.general.homebrew:
     name: rbenv
     state: present
 
 - name: Make sure ruby-build is installed
-  homebrew:
+  community.general.homebrew:
     name: ruby-build
     state: present
 
@@ -13,12 +13,12 @@
   ansible.builtin.shell: |
     set -o pipefail
     rbenv install -l | grep -v - | tail -1 | tr -d '[:space:]'
-  register: latest_ruby_version
+  register: ruby_latest_version
   changed_when: false
 
 - name: Get current global Ruby version
   ansible.builtin.command: rbenv global
-  register: current_ruby_version
+  register: ruby_current_version
   changed_when: false
   failed_when: false
 
