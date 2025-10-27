@@ -43,18 +43,22 @@
       tags: ["ruby"]
 
   tasks:
-    - ansible.builtin.import_tasks: tasks/python.yml
+    - name: Configure Python
+      ansible.builtin.import_tasks: tasks/python.yml
       when: configure_python | default(false)
       tags: ["python"]
 
-    - ansible.builtin.import_tasks: tasks/node.yml
+    - name: Configure Node
+      ansible.builtin.import_tasks: tasks/node.yml
       when: configure_node | default(false)
       tags: ["node"]
 
-    - ansible.builtin.import_tasks: tasks/osx.yml
-      tags: ["osx"]
+    - name: Configure macOS
+      ansible.builtin.import_tasks: tasks/macos.yml
+      tags: ["macos"]
 
-    - ansible.builtin.import_tasks: tasks/iterm2.yml
+    - name: Configure iterm2
+      ansible.builtin.import_tasks: tasks/iterm2.yml
       when: configure_iterm2 | default(false)
       tags: ["iterm2"]
 
