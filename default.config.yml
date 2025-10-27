@@ -1,7 +1,6 @@
 ---
 configure_dotfiles: true
 configure_iterm2: true
-configure_ohmyzsh: true
 configure_node: true
 configure_python: true
 configure_ruby: true
@@ -17,6 +16,7 @@ dotfiles_files:
   - .gitignore
   - .osx
   - .vimrc
+  - .zimrc
   - .zshrc
 
 # Homebrew configuration
@@ -29,7 +29,7 @@ homebrew_installed_packages:
   - sqlite
   - tmux
   - vim
-  - zsh-autosuggestions
+  - zimfw
 
 homebrew_cask_appdir: /Applications
 homebrew_cask_apps:
@@ -46,10 +46,10 @@ oh_my_zsh_theme: agnoster
 
 # Iterm2 configuration
 iterm2_fonts:
-  - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20for%20Powerline.ttf?raw=true
-  - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20Medium%20for%20Powerline.ttf?raw=true
-  - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20Thin%20for%20Powerline.ttf?raw=true
-  - https://github.com/powerline/fonts/blob/master/RobotoMono/Roboto%20Mono%20Light%20for%20Powerline.ttf?raw=true
+  - https://raw.githubusercontent.com/powerline/fonts/refs/heads/master/RobotoMono/Roboto%20Mono%20for%20Powerline.ttf
+  - https://raw.githubusercontent.com/powerline/fonts/refs/heads/master/RobotoMono/Roboto%20Mono%20Medium%20for%20Powerline.ttf
+  - https://raw.githubusercontent.com/powerline/fonts/refs/heads/master/RobotoMono/Roboto%20Mono%20Thin%20for%20Powerline.ttf
+  - https://raw.githubusercontent.com/powerline/fonts/refs/heads/master/RobotoMono/Roboto%20Mono%20Light%20for%20Powerline.ttf
 iterm2_preferences_destination: ~/iterm2
 
 # Glob pattern to ansible task files to run after all other tasks are finished.

@@ -34,10 +34,6 @@
         (mas_installed_app_ids | default([]) | length > 0)
       tags: ["mas"]
 
-    - role: oh_my_zsh
-      when: configure_ohmyzsh | default(false)
-      tags: ["ohmyzsh"]
-
     - role: geerlingguy.dotfiles
       when: configure_dotfiles | default(false)
       tags: ["dotfiles"]
