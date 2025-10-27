@@ -21,6 +21,12 @@
     force: false
   when: iterm2_stat.stat.exists
 
+- name: Ensure Fonts directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/Library/Fonts"
+    state: directory
+    mode: "0755"
+
 - name: Ensure fonts are installed
   ansible.builtin.get_url:
     url: "{{ item }}"
