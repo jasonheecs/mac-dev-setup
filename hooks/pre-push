@@ -1,0 +1,80 @@
+#!/bin/sh
+
+# This git hook is called by "git push" after it has checked the remote status, 
+# but before anything has been pushed.
+# If this script exits with a non-zero status nothing will be pushed.
+#
+# This hook is called with the following parameters:
+#
+# $1 -- Name of the remote to which the push is being done
+# $2 -- URL to which the push is being done
+#
+# If pushing without using a named remote those arguments will be equal.
+#
+# Information about the commits which are being pushed is supplied as lines to
+# the standard input in the form:
+#
+#   <local ref> <local oid> <remote ref> <remote oid>
+
+# In this git hook, we use yamllint
+# on all changed yaml files before pushing to origin
+
+zero=$(git hash-object --stdin </dev/null | tr '0-9a-f' '0')
+
+# Read stdin to get the list of refs being pushed
+while read -r _ local_sha _ remote_sha
+do
+    # If we're deleting a branch, skip it
+    if test "$local_sha" = "$zero"; then
+        continue
+    fi
+    
+    # Get list of files that differ between remote and local
+    if test "$remote_sha" = "$zero"; then
+        # New branch - examine all commits
+        range="$local_sha"
+    else
+        # Existing branch - examine commits between remote and local
+        range="$remote_sha..$local_sha"
+    fi
+    
+    # Get all YAML files in the commits being pushed
+    yaml_files=$(git diff --name-only --diff-filter=ACM "$range" | grep -E '\.(yml|yaml)$')
+    
+    if [ -n "$yaml_files" ]; then
+        echo "Found YAML changes in commits, running yamllint..."
+        failed=0
+        echo "$yaml_files" | while read -r file; do
+            # Check if file exists in the current commit
+            if git cat-file -e "$local_sha:$file" 2>/dev/null; then
+                echo "Checking: $file"
+                
+                file_content=$(git show "$local_sha:$file")
+                
+                # Run yamllint
+                if ! echo "$file_content" | yamllint -; then
+                    echo "yamllint failed for $file"
+                    exit 1
+                fi
+            fi
+        done || failed=1
+
+        if test "$failed" -eq 1; then
+           echo "Pre-push hook failed: yamllint errors detected"
+           exit 1
+        fi
+        
+        echo "All YAML files passed yamllint"
+
+        # Run ansible-playbook syntax check
+        echo "Running ansible-playbook syntax check..."
+        if ! ansible-playbook main.yml --syntax-check; then
+            echo "ansible-playbook syntax check failed"
+            exit 1
+        fi
+        echo "Ansible playbook syntax check passed"
+
+    fi
+done
+
+exit 0
