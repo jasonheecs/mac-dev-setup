@@ -52,6 +52,7 @@ setup_pyenv() {
     	pyenv global "${LATEST_PYTHON_VERSION}"
     	pyenv rehash
 
+        # shellcheck disable=SC2016
         echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
         eval "$(pyenv init --path)"
     fi
@@ -62,27 +63,20 @@ install_ansible() {
 	pip install ansible
 }
 
-function source_if_exists()
-{
-    if [[ -r $1 ]]; then
-        source $1
-    fi
-}
 
-source_if_exists ~/.zprofile
+# source .zprofile if it exists
+if [[ -r ~/.zprofile ]]; then
+    # shellcheck source=/dev/null
+    source ~/.zprofile
+fi
+
 install_homebrew
 setup_pyenv
 brew cleanup
-
-source ~/.zprofile
 hash -r
 python --version
 
 # Run main ansible playbook
 pip install ansible
 ansible-galaxy install -r requirements.yml
-if [[ "${IN_VAGRANT}" == "true" ]]; then
-    ansible-playbook ./main.yml --extra-vars "ansible_become_pass=vagrant" -v
-else
-    ansible-playbook ./main.yml
-fi
+ansible-playbook ./main.yml
