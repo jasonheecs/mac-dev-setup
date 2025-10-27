@@ -51,8 +51,22 @@
     path: "{{ ansible_env.HOME }}/.iterm2_shell_integration.zsh"
   register: shell_integration
 
-- name: Ensure shell integration is installed
-  ansible.builtin.shell: curl -L https://iterm2.com/misc/install_shell_integration.sh | bash
+- name: Download shell integration script
+  ansible.builtin.uri:
+    url: https://iterm2.com/misc/install_shell_integration.sh
+    return_content: true
+  register: shell_integration_script
   when:
     - iterm2_stat.stat.exists
     - not shell_integration.stat.exists
+
+- name: Install shell integration
+  ansible.builtin.shell: "{{ shell_integration_script.content }}"
+  args:
+    executable: /bin/bash
+  register: shell_integration_result
+  changed_when: shell_integration_result.rc == 0
+  when:
+    - iterm2_stat.stat.exists
+    - not shell_integration.stat.exists
+    - shell_integration_script is defined
