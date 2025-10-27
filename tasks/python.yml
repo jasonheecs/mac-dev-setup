@@ -29,8 +29,4 @@
   ansible.builtin.command: pyenv global "{{ latest_python_version.stdout }}"
   when: current_python_version.stdout != latest_python_version.stdout
   changed_when: true
-
-- name: Rehash pyenv shims
-  ansible.builtin.command: pyenv rehash
-  when: python_install is changed
-  changed_when: true
+  notify: Rehash pyenv shims
