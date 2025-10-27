@@ -17,20 +17,19 @@
 #   <local ref> <local oid> <remote ref> <remote oid>
 
 # Get a list of staged Ansible files
-ANSIBLE_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(yml|yaml)$')
+YAML_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(yml|yaml)$')
 
-echo "test"
-
-if [ -n "$ANSIBLE_FILES" ]; then
+if [ -n "$YAML_FILES" ]; then
     echo "Running ansible-lint on staged files..."
-    ansible-lint $ANSIBLE_FILES
-    if [ $? -ne 0 ]; then
+
+    if ! ansible-lint "$YAML_FILES"; then
         echo "Ansible Lint failed. Aborting commit."
         exit 1
     fi
 
-    yamllint .
-    if [ $? -ne 0 ]; then
+    echo "Running yamllint on staged files..."
+
+    if ! yamllint "$YAML_FILES"; then
         echo "yamllint failed. Aborting commit."
         exit 1
     fi
