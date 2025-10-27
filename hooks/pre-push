@@ -16,22 +16,62 @@
 #
 #   <local ref> <local oid> <remote ref> <remote oid>
 
-# Get a list of staged Ansible files
-YAML_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(yml|yaml)$')
+# In this git hook, we use yamllint and ansible-lint
+# on all changed yaml files before pushing to origin
 
-if [ -n "$YAML_FILES" ]; then
-    echo "Running ansible-lint on staged files..."
+zero=$(git hash-object --stdin </dev/null | tr '0-9a-f' '0')
 
-    if ! ansible-lint "$YAML_FILES"; then
-        echo "Ansible Lint failed. Aborting commit."
-        exit 1
+# Read stdin to get the list of refs being pushed
+while read -r _ local_sha _ remote_sha
+do
+    # If we're deleting a branch, skip it
+    if test "$local_sha" = "$zero"; then
+        continue
     fi
-
-    echo "Running yamllint on staged files..."
-
-    if ! yamllint "$YAML_FILES"; then
-        echo "yamllint failed. Aborting commit."
-        exit 1
+    
+    # Get list of files that differ between remote and local
+    if test "$remote_sha" = "$zero"; then
+        # New branch - examine all commits
+        range="$local_sha"
+    else
+        # Existing branch - examine commits between remote and local
+        range="$remote_sha..$local_sha"
     fi
-fi
+    
+    # Get all YAML files in the commits being pushed
+    yaml_files=$(git diff --name-only --diff-filter=ACM "$range" | grep -E '\.(yml|yaml)$')
+    
+    if [ -n "$yaml_files" ]; then
+        echo "Found YAML changes in commits, running yamllint and ansible-lint..."
+        echo "$yaml_files" | while read -r file; do
+            # Check if file exists in the current commit
+            if git cat-file -e "$local_sha:$file" 2>/dev/null; then
+                echo "Checking: $file"
+                
+                # Store file content in variable
+                file_content=$(git show "$local_sha:$file")
+                
+                # Run yamllint
+                if ! echo "$file_content" | yamllint -; then
+                    echo "yamllint failed for $file"
+                    exit 1
+                fi
+                
+                # Run ansible-lint
+                if ! echo "$file_content" | ansible-lint --stdin-filename="$file" -; then
+                    echo "ansible-lint failed for $file"
+                    exit 1
+                fi
+            fi
+        done || failed=1
+        
+        if test "$failed" -eq 1; then
+            echo "Pre-push hook failed: linting errors detected"
+            exit 1
+        fi
+        
+        echo "All YAML files passed yamllint and ansible-lint"
+    fi
+done
+
 exit 0
