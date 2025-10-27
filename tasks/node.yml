@@ -1,11 +1,15 @@
 ---
 - name: Make sure fnm is installed
-  homebrew:
+  community.general.homebrew:
     name: fnm
     state: present
 
 - name: Get latest LTS Node version
-  ansible.builtin.shell: fnm ls-remote --lts | tail -1 | awk '{print $1}'
+  ansible.builtin.shell: |
+    set -o pipefail
+    fnm ls-remote --lts | tail -1 | awk '{print $1}'
+  args:
+    executable: /bin/bash
   register: latest_lts_version
   changed_when: false
   environment:
@@ -22,11 +26,13 @@
 - name: Install latest LTS Node version via fnm
   ansible.builtin.command: fnm install --lts
   when: current_node_version.stdout != latest_lts_version.stdout
+  changed_when: true
   environment:
     PATH: "/opt/homebrew/bin:{{ ansible_env.PATH }}"
 
 - name: Set default to latest LTS
   ansible.builtin.command: fnm default lts-latest
   when: current_node_version.stdout != latest_lts_version.stdout
+  changed_when: true
   environment:
     PATH: "/opt/homebrew/bin:{{ ansible_env.PATH }}"
