@@ -24,8 +24,8 @@
 
 - name: Install latest Ruby version via rbenv
   ansible.builtin.command:
-    rbenv install "{{ latest_ruby_version.stdout }}" --skip-existing
-  when: current_ruby_version.stdout != latest_ruby_version.stdout
+    rbenv install "{{ ruby_latest_version.stdout }}" --skip-existing
+  when: ruby_current_version.stdout != ruby_latest_version.stdout
   register: ruby_install
   changed_when: ruby_install.stdout | trim | length > 0
   notify:
