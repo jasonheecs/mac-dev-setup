@@ -9,7 +9,9 @@
   register: osx_stat
 
 - name: Ensuring execution permissions for .osx file
-  ansible.builtin.file: dest="{{ osx_file_path }}" mode=a+x
+  ansible.builtin.file:
+    dest: "{{ osx_file_path }}"
+    mode: a+x
   when: osx_stat.stat.exists
 
 - name: Run .osx dotfile

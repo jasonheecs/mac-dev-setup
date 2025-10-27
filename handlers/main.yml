@@ -1,0 +1,4 @@
+---
+- name: Rehash pyenv shims
+  ansible.builtin.command: pyenv rehash
+  changed_when: true

@@ -1,11 +1,18 @@
 ---
 - name: Make sure pyenv is installed
-  homebrew:
+  community.general.homebrew:
     name: pyenv
     state: present
 
 - name: Get latest available stable Python version
-  ansible.builtin.shell: pyenv install -l | grep -E '^\s*[0-9]+\.[0-9]+\.[0-9]+$' | tail -1 | tr -d '[:space:]'
+  ansible.builtin.shell: |
+    set -o pipefail
+    pyenv install -l \
+      | grep -E '^\s*[0-9]+\.[0-9]+\.[0-9]+$' \
+      | tail -1 \
+      | tr -d '[:space:]'
+  args:
+    executable: /bin/bash
   register: latest_python_version
   changed_when: false
 
@@ -16,14 +23,14 @@
   failed_when: false
 
 - name: Install latest Python version via pyenv
-  ansible.builtin.command: pyenv install "{{ latest_python_version.stdout }}" --skip-existing
+  ansible.builtin.command:
+    pyenv install "{{ latest_python_version.stdout }}" --skip-existing
   when: current_python_version.stdout != latest_python_version.stdout
+  changed_when: true
   register: python_install
 
 - name: Set global Python version to latest
   ansible.builtin.command: pyenv global "{{ latest_python_version.stdout }}"
   when: current_python_version.stdout != latest_python_version.stdout
-
-- name: Rehash pyenv shims
-  ansible.builtin.command: pyenv rehash
-  when: python_install is changed
+  changed_when: true
+  notify: Rehash pyenv shims
