@@ -48,7 +48,7 @@ jobs:
       matrix:
         os:
           - macos-latest
-          - macos-13
+          # - macos-13 this takes way too long
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v5

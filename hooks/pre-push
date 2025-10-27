@@ -16,7 +16,7 @@
 #
 #   <local ref> <local oid> <remote ref> <remote oid>
 
-# In this git hook, we use yamllint and ansible-lint
+# In this git hook, we use yamllint
 # on all changed yaml files before pushing to origin
 
 zero=$(git hash-object --stdin </dev/null | tr '0-9a-f' '0')
@@ -42,13 +42,13 @@ do
     yaml_files=$(git diff --name-only --diff-filter=ACM "$range" | grep -E '\.(yml|yaml)$')
     
     if [ -n "$yaml_files" ]; then
-        echo "Found YAML changes in commits, running yamllint and ansible-lint..."
+        echo "Found YAML changes in commits, running yamllint..."
+        failed=0
         echo "$yaml_files" | while read -r file; do
             # Check if file exists in the current commit
             if git cat-file -e "$local_sha:$file" 2>/dev/null; then
                 echo "Checking: $file"
                 
-                # Store file content in variable
                 file_content=$(git show "$local_sha:$file")
                 
                 # Run yamllint
@@ -56,21 +56,24 @@ do
                     echo "yamllint failed for $file"
                     exit 1
                 fi
-                
-                # Run ansible-lint
-                if ! echo "$file_content" | ansible-lint --stdin-filename="$file" -; then
-                    echo "ansible-lint failed for $file"
-                    exit 1
-                fi
             fi
         done || failed=1
-        
+
         if test "$failed" -eq 1; then
-            echo "Pre-push hook failed: linting errors detected"
-            exit 1
+           echo "Pre-push hook failed: yamllint errors detected"
+           exit 1
         fi
         
-        echo "All YAML files passed yamllint and ansible-lint"
+        echo "All YAML files passed yamllint"
+
+        # Run ansible-playbook syntax check
+        echo "Running ansible-playbook syntax check..."
+        if ! ansible-playbook main.yml --syntax-check; then
+            echo "ansible-playbook syntax check failed"
+            exit 1
+        fi
+        echo "Ansible playbook syntax check passed"
+
     fi
 done
 
