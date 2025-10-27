@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # This git hook is called by "git push" after it has checked the remote status, 
 # but before anything has been pushed.
@@ -21,60 +21,98 @@
 
 zero=$(git hash-object --stdin </dev/null | tr '0-9a-f' '0')
 
-# Read stdin to get the list of refs being pushed
-while read -r _ local_sha _ remote_sha
-do
-    # If we're deleting a branch, skip it
-    if test "$local_sha" = "$zero"; then
-        continue
+lint_yaml_file() {
+    local local_sha="$1"
+    local file="$2"
+    
+    if ! git cat-file -e "$local_sha:$file" 2>/dev/null; then
+        return 0
     fi
     
-    # Get list of files that differ between remote and local
-    if test "$remote_sha" = "$zero"; then
-        # New branch - examine all commits
-        range="$local_sha"
-    else
-        # Existing branch - examine commits between remote and local
-        range="$remote_sha..$local_sha"
+    echo "Checking: $file"
+    file_content=$(git show "$local_sha:$file")
+    
+    if ! echo "$file_content" | yamllint -; then
+        echo "yamllint failed for $file"
+        return 1
     fi
     
-    # Get all YAML files in the commits being pushed
-    yaml_files=$(git diff --name-only --diff-filter=ACM "$range" | grep -E '\.(yml|yaml)$')
+    return 0
+}
+
+lint_yaml_files() {
+    local local_sha="$1"
+    local yaml_files="$2"
     
-    if [ -n "$yaml_files" ]; then
-        echo "Found YAML changes in commits, running yamllint..."
-        failed=0
-        echo "$yaml_files" | while read -r file; do
-            # Check if file exists in the current commit
-            if git cat-file -e "$local_sha:$file" 2>/dev/null; then
-                echo "Checking: $file"
-                
-                file_content=$(git show "$local_sha:$file")
-                
-                # Run yamllint
-                if ! echo "$file_content" | yamllint -; then
-                    echo "yamllint failed for $file"
-                    exit 1
-                fi
-            fi
-        done || failed=1
-
-        if test "$failed" -eq 1; then
-           echo "Pre-push hook failed: yamllint errors detected"
-           exit 1
-        fi
-        
-        echo "All YAML files passed yamllint"
-
-        # Run ansible-playbook syntax check
-        echo "Running ansible-playbook syntax check..."
-        if ! ansible-playbook main.yml --syntax-check; then
-            echo "ansible-playbook syntax check failed"
+    echo "Found YAML changes in commits, running yamllint..."
+    
+    failed=0
+    echo "$yaml_files" | while read -r file; do
+        if ! lint_yaml_file "$local_sha" "$file"; then
             exit 1
         fi
-        echo "Ansible playbook syntax check passed"
-
+    done || failed=1
+    
+    if test "$failed" -eq 1; then
+        echo "Pre-push hook failed: yamllint errors detected"
+        return 1
     fi
-done
+    
+    echo "All YAML files passed yamllint"
+    return 0
+}
 
-exit 0
+check_ansible_playbook_syntax() {
+    echo "Running ansible-playbook syntax check..."
+    
+    if ! ansible-playbook main.yml --syntax-check; then
+        echo "ansible-playbook syntax check failed"
+        return 1
+    fi
+    
+    echo "Ansible playbook syntax check passed"
+    return 0
+}
+
+# Get the commit range to check
+get_commit_range() {
+    local local_sha="$1"
+    local remote_sha="$2"
+    
+    if test "$remote_sha" = "$zero"; then
+        # New branch - examine all commits
+        echo "$local_sha"
+    else
+        # Existing branch - examine commits between remote and local
+        echo "$remote_sha..$local_sha"
+    fi
+}
+
+main() {
+    # Read stdin to get the list of refs being pushed
+    while read -r _ local_sha _ remote_sha
+    do
+        # If we're deleting a branch, skip it
+        if test "$local_sha" = "$zero"; then
+            continue
+        fi
+        
+        # Get list of files that differ between remote and local
+        range=$(get_commit_range "$local_sha" "$remote_sha")
+        
+        # Get all YAML files in the commits being pushed
+        yaml_files=$(
+            git diff --name-only --diff-filter=ACM "$range" | grep -E '\.(yml|yaml)$'
+        )
+        
+        if [ -n "$yaml_files" ]; then
+            if ! lint_yaml_files "$local_sha" "$yaml_files" || ! check_ansible_playbook_syntax ; then
+                exit 1
+            fi
+        fi
+    done
+    
+    exit 0
+}
+
+main
