@@ -28,5 +28,11 @@ if [ -n "$ANSIBLE_FILES" ]; then
         echo "Ansible Lint failed. Aborting commit."
         exit 1
     fi
+
+    yamllint .
+    if [ $? -ne 0 ]; then
+        echo "yamllint failed. Aborting commit."
+        exit 1
+    fi
 fi
 exit 0
