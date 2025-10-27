@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# This git hook is called by "git push" after it has checked the remote status, 
+# but before anything has been pushed.
+# If this script exits with a non-zero status nothing will be pushed.
+#
+# This hook is called with the following parameters:
+#
+# $1 -- Name of the remote to which the push is being done
+# $2 -- URL to which the push is being done
+#
+# If pushing without using a named remote those arguments will be equal.
+#
+# Information about the commits which are being pushed is supplied as lines to
+# the standard input in the form:
+#
+#   <local ref> <local oid> <remote ref> <remote oid>
+
+# Get a list of staged Ansible files
+ANSIBLE_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(yml|yaml)$')
+
+if [ -n "$ANSIBLE_FILES" ]; then
+    echo "Running ansible-lint on staged files..."
+    ansible-lint $ANSIBLE_FILES
+    if [ $? -ne 0 ]; then
+        echo "Ansible Lint failed. Aborting commit."
+        exit 1
+    fi
+fi
+exit 0
