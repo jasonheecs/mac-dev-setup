@@ -23,7 +23,12 @@ jobs:
 
   integration:
     name: Integration with Homebrew already installed in machine
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - macos-latest
+          - macos-13
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v5
@@ -38,8 +43,12 @@ jobs:
 
   integration_homebrew_not_installed:
     name: Integration tests without Homebrew installed in machine
-    runs-on: macos-latest
-    needs: integration
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - macos-latest
+          - macos-13
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v5
