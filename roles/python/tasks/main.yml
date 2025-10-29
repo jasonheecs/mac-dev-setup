@@ -13,24 +13,24 @@
       | tr -d '[:space:]'
   args:
     executable: /bin/bash
-  register: latest_python_version
+  register: python_latest_version
   changed_when: false
 
 - name: Get current global Python version
   ansible.builtin.command: pyenv global
-  register: current_python_version
+  register: python_current_version
   changed_when: false
   failed_when: false
 
 - name: Install latest Python version via pyenv
   ansible.builtin.command:
-    pyenv install "{{ latest_python_version.stdout }}" --skip-existing
-  when: current_python_version.stdout != latest_python_version.stdout
+    pyenv install "{{ python_latest_version.stdout }}" --skip-existing
+  when: python_current_version.stdout != python_latest_version.stdout
   changed_when: true
   register: python_install
 
 - name: Set global Python version to latest
-  ansible.builtin.command: pyenv global "{{ latest_python_version.stdout }}"
-  when: current_python_version.stdout != latest_python_version.stdout
+  ansible.builtin.command: pyenv global "{{ python_latest_version.stdout }}"
+  when: python_current_version.stdout != python_latest_version.stdout
   changed_when: true
   notify: Rehash pyenv shims
