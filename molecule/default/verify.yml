@@ -1,30 +1,17 @@
 ---
-- name: Verify
+- name: Verify system setup
   hosts: all
   connection: local
   gather_facts: false
-  vars:
-    expected_casks:
-      - google-chrome
-      - iterm2
-      - sublime-text
-    expected_packages:
-      - fnm
-      - php
-      - pyenv
-      - rbenv
-      - ruby-build
-      - sqlite
-      - tmux
-      - vim
-      - zimfw
+  vars_files: ../../default.config.yml
+
   tasks:
     - name: Check if casks are installed
       ansible.builtin.command: brew list --cask {{ item }}
       register: cask_checks
       failed_when: false
       changed_when: false
-      loop: "{{ expected_casks }}"
+      loop: "{{ homebrew_cask_apps }}"
 
     - name: Assert casks are installed
       ansible.builtin.assert:
@@ -41,7 +28,7 @@
       register: package_checks
       failed_when: false
       changed_when: false
-      loop: "{{ expected_packages }}"
+      loop: "{{ homebrew_installed_packages }}"
 
     - name: Assert packages are installed
       ansible.builtin.assert:
@@ -50,5 +37,22 @@
         fail_msg: "Package {{ item.item }} is not installed"
         success_msg: "Package {{ item.item }} is installed"
       loop: "{{ package_checks.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+
+    - name: Check if dotfiles are present
+      ansible.builtin.stat:
+        path: "{{ dotfiles_home }}/{{ item }}"
+      register: dotfile_checks
+      loop: "{{ dotfiles_files }}"
+
+    - name: Assert dotfiles are symlinks
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+          - item.stat.islnk
+        fail_msg: "File {{ item.item }} is not present"
+        success_msg: "File {{ item.item }} is present"
+      loop: "{{ dotfile_checks.results }}"
       loop_control:
         label: "{{ item.item }}"

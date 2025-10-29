@@ -13,7 +13,7 @@ ansible:
   cfg:
     defaults:
       host_key_checking: false
-      verbosity: 2
+      verbosity: 1
     ssh_connection:
       pipelining: true
 
@@ -29,7 +29,7 @@ ansible:
         - --diff
         - --force-handlers
         - --inventory=inventory.ini
-        - -vv
+        - -v
       ansible_navigator:
         - --mode stdout
         - --pull-policy missing
