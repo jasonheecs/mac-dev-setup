@@ -62,10 +62,5 @@ jobs:
       - name: Uninstall CI runners' built-in Homebrew.
         run: tests/uninstall_homebrew.sh
 
-      - name: Uninstall Ci runners' Python setup
-        run: |
-          pyenv uninstall $(pyenv global)
-          brew uninstall pyenv
-
       - name: Run the setup script
         run: ./setup.sh
