@@ -76,7 +76,10 @@
     - shell_is_supported
 
 - name: Install shell integration
-  ansible.builtin.command: "{{ shell_integration_script.content }}"
+  ansible.builtin.shell: |
+    {{ shell_integration_script.content }}
+  args:
+    executable: /bin/bash
   register: shell_integration_result
   changed_when: shell_integration_result.rc == 0
   when:
