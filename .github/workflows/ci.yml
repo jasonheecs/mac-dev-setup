@@ -39,8 +39,16 @@ jobs:
           sudo rm -rf /Applications/Firefox.app
           sudo rm -rf /Applications/Google\ Chrome.app
 
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install test dependencies
+        run: pip install -r requirements.txt
+
       - name: Run the tests
-        uses: gofrolist/molecule-action@v2
+        run: molecule test
 
   integration_setup_script:
     name: Integration tests for setup script
