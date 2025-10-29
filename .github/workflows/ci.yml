@@ -24,6 +24,7 @@ jobs:
   integration_playbook:
     name: Integration tests for ansible playbook
     runs-on: ${{ matrix.os }}
+    needs: lint
     strategy:
       matrix:
         os:
@@ -44,6 +45,7 @@ jobs:
   integration_setup_script:
     name: Integration tests for setup script
     runs-on: macos-latest
+    needs: lint
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v5
