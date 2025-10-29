@@ -8,33 +8,23 @@
   ansible.builtin.shell: |
     set -o pipefail
     fnm ls-remote --lts | tail -1 | awk '{print $1}'
-  args:
-    executable: /bin/bash
   register: node_latest_lts_version
   changed_when: false
-  environment:
-    PATH: "/opt/homebrew/bin:{{ ansible_env.PATH }}"
 
 - name: Get installed Node versions
   ansible.builtin.command: fnm list
   register: node_installed_versions
   changed_when: false
   failed_when: false
-  environment:
-    PATH: "/opt/homebrew/bin:{{ ansible_env.PATH }}"
 
 - name: Get current default Node version
   ansible.builtin.shell: |
     set -o pipefail
     eval "$(fnm env)"
     fnm current
-  args:
-    executable: /bin/bash
   register: node_current_version
   changed_when: false
   failed_when: false
-  environment:
-    PATH: "/opt/homebrew/bin:{{ ansible_env.PATH }}"
 
 - name: Check if latest LTS is installed
   ansible.builtin.set_fact:
@@ -44,13 +34,8 @@
   ansible.builtin.command: fnm install {{ node_latest_lts_version.stdout }}
   when: not node_lts_already_installed
   changed_when: true
-  environment:
-    PATH: "/opt/homebrew/bin:{{ ansible_env.PATH }}"
 
 - name: Set default to latest LTS
   ansible.builtin.command: fnm default {{ node_latest_lts_version.stdout }}
   when: node_current_version.stdout.strip() != node_latest_lts_version.stdout.strip()
   changed_when: node_current_version.stdout.strip() != node_latest_lts_version.stdout.strip()
-  environment:
-    PATH: "/opt/homebrew/bin:{{ ansible_env.PATH }}"
-  notify: Get fnm environment

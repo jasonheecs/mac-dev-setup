@@ -1,3 +1,0 @@
----
-- name: Get fnm environment
-  ansible.builtin.shell: fnm env

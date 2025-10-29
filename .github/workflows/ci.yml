@@ -12,14 +12,14 @@ jobs:
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v5
-      # - name: Lint YAML files
-      #   uses: ibiqlik/action-yamllint@master
-      # - name: Run Ansible Lint
-      #   uses: ansible/ansible-lint@main
-      # - name: Run shellcheck
-      #   uses: ludeeus/action-shellcheck@master
-      #   with:
-      #     ignore_paths: .ansible
+      - name: Lint YAML files
+        uses: ibiqlik/action-yamllint@master
+      - name: Run Ansible Lint
+        uses: ansible/ansible-lint@main
+      - name: Run shellcheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          ignore_paths: .ansible
 
   integration_playbook:
     name: Integration tests for ansible playbook
