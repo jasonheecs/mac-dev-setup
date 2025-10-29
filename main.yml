@@ -50,12 +50,11 @@
       when: configure_python | default(false)
       tags: ["python"]
 
-  tasks:
-    - name: Configure Node
-      ansible.builtin.import_tasks: tasks/node.yml
+    - role: node
       when: configure_node | default(false)
       tags: ["node"]
 
+  tasks:
     - name: Configure macOS
       ansible.builtin.import_tasks: tasks/macos.yml
       tags: ["macos"]
