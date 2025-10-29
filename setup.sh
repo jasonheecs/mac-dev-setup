@@ -141,16 +141,8 @@ run_ansible_playbook() {
         return 1
     fi
 
-    # Use sudo password environment variable if available
-    # Useful for running tests
-    if [[ -n "${BECOME_PASSWORD}" ]]; then
-        log_info "Running Ansible playbook with provided password..."
-        ansible-playbook ./main.yml \
-            --extra-vars "ansible_become_password=${BECOME_PASSWORD}"
-    else
-        log_info "Running Ansible playbook..."
-        ansible-playbook ./main.yml
-    fi
+    log_info "Running Ansible playbook..."
+    ansible-playbook ./main.yml
 }
 
 show_system_info() {

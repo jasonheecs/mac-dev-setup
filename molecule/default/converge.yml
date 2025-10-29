@@ -1,12 +1,3 @@
 ---
 - name: Converge
-  hosts: all
-  connection: local
-  gather_facts: false
-  tasks:
-    - name: Run setup script
-      ansible.builtin.shell: ./setup.sh
-      args:
-        chdir: ../../
-      environment:
-        BECOME_PASSWORD: "{{ lookup('env', 'BECOME_PASSWORD') }}"
+  ansible.builtin.import_playbook: ../../main.yml
