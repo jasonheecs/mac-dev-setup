@@ -46,12 +46,11 @@
       when: configure_ruby | default(false)
       tags: ["ruby"]
 
-  tasks:
-    - name: Configure Python
-      ansible.builtin.import_tasks: tasks/python.yml
+    - role: python
       when: configure_python | default(false)
       tags: ["python"]
 
+  tasks:
     - name: Configure Node
       ansible.builtin.import_tasks: tasks/node.yml
       when: configure_node | default(false)
