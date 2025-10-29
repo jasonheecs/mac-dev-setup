@@ -6,53 +6,20 @@
   vars_files: ../../default.config.yml
 
   tasks:
-    - name: Check if casks are installed
-      ansible.builtin.command: brew list --cask {{ item }}
-      register: cask_checks
-      failed_when: false
-      changed_when: false
-      loop: "{{ homebrew_cask_apps }}"
+    - name: Verify Homebrew casks
+      ansible.builtin.include_tasks: tasks/verify_brew.yml
+      vars:
+        brew_type: cask
+        brew_items: "{{ homebrew_cask_apps }}"
+      tags: ["homebrew"]
 
-    - name: Assert casks are installed
-      ansible.builtin.assert:
-        that:
-          - item.rc == 0
-        fail_msg: "Cask {{ item.item }} is not installed"
-        success_msg: "Cask {{ item.item }} is installed"
-      loop: "{{ cask_checks.results }}"
-      loop_control:
-        label: "{{ item.item }}"
+    - name: Verify Homebrew packages
+      ansible.builtin.include_tasks: tasks/verify_brew.yml
+      vars:
+        brew_type: formula
+        brew_items: "{{ homebrew_installed_packages }}"
+      tags: ["homebrew"]
 
-    - name: Check if packages are installed
-      ansible.builtin.command: brew list {{ item }}
-      register: package_checks
-      failed_when: false
-      changed_when: false
-      loop: "{{ homebrew_installed_packages }}"
-
-    - name: Assert packages are installed
-      ansible.builtin.assert:
-        that:
-          - item.rc == 0
-        fail_msg: "Package {{ item.item }} is not installed"
-        success_msg: "Package {{ item.item }} is installed"
-      loop: "{{ package_checks.results }}"
-      loop_control:
-        label: "{{ item.item }}"
-
-    - name: Check if dotfiles are present
-      ansible.builtin.stat:
-        path: "{{ dotfiles_home }}/{{ item }}"
-      register: dotfile_checks
-      loop: "{{ dotfiles_files }}"
-
-    - name: Assert dotfiles are symlinks
-      ansible.builtin.assert:
-        that:
-          - item.stat.exists
-          - item.stat.islnk
-        fail_msg: "File {{ item.item }} is not present"
-        success_msg: "File {{ item.item }} is present"
-      loop: "{{ dotfile_checks.results }}"
-      loop_control:
-        label: "{{ item.item }}"
+    - name: Verify dotfiles
+      ansible.builtin.include_tasks: tasks/verify_dotfiles.yml
+      tags: ["dotfiles"]
