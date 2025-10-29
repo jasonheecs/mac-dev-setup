@@ -56,6 +56,10 @@
     - iterm2_stat.stat.exists
     - iterm2_preferences_destination | default('') | length > 0
 
+- name: Check if current shell is supported
+  ansible.builtin.set_fact:
+    shell_is_supported: "{{ ansible_env.SHELL | basename in ['bash', 'zsh', 'fish', 'tcsh'] }}"
+
 - name: Check if shell integration is already installed
   ansible.builtin.stat:
     path: "{{ ansible_env.HOME }}/.iterm2_shell_integration.zsh"
@@ -69,6 +73,7 @@
   when:
     - iterm2_stat.stat.exists
     - not shell_integration.stat.exists
+    - shell_is_supported
 
 - name: Install shell integration
   ansible.builtin.shell: "{{ shell_integration_script.content }}"
@@ -80,3 +85,4 @@
     - iterm2_stat.stat.exists
     - not shell_integration.stat.exists
     - shell_integration_script is defined
+    - shell_is_supported
