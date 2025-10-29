@@ -1,0 +1,54 @@
+---
+- name: Verify
+  hosts: all
+  connection: local
+  gather_facts: false
+  vars:
+    expected_casks:
+      - google-chrome
+      - iterm2
+      - sublime-text
+    expected_packages:
+      - fnm
+      - php
+      - pyenv
+      - rbenv
+      - ruby-build
+      - sqlite
+      - tmux
+      - vim
+      - zimfw
+  tasks:
+    - name: Check if casks are installed
+      ansible.builtin.command: brew list --cask {{ item }}
+      register: cask_checks
+      failed_when: false
+      changed_when: false
+      loop: "{{ expected_casks }}"
+
+    - name: Assert casks are installed
+      ansible.builtin.assert:
+        that:
+          - item.rc == 0
+        fail_msg: "Cask {{ item.item }} is not installed"
+        success_msg: "Cask {{ item.item }} is installed"
+      loop: "{{ cask_checks.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+
+    - name: Check if packages are installed
+      ansible.builtin.command: brew list {{ item }}
+      register: package_checks
+      failed_when: false
+      changed_when: false
+      loop: "{{ expected_packages }}"
+
+    - name: Assert packages are installed
+      ansible.builtin.assert:
+        that:
+          - item.rc == 0
+        fail_msg: "Package {{ item.item }} is not installed"
+        success_msg: "Package {{ item.item }} is installed"
+      loop: "{{ package_checks.results }}"
+      loop_control:
+        label: "{{ item.item }}"
