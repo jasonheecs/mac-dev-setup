@@ -48,7 +48,7 @@
 
 - name: Set default to latest LTS
   ansible.builtin.command: fnm default {{ node_latest_lts_version.stdout }}
-  when: node_current_version.stdout != node_latest_lts_version.stdout
-  changed_when: true
+  when: node_current_version.stdout.strip() != node_latest_lts_version.stdout.strip()
+  changed_when: node_current_version.stdout.strip() != node_latest_lts_version.stdout.strip()
   environment:
     PATH: "/opt/homebrew/bin:{{ ansible_env.PATH }}"
