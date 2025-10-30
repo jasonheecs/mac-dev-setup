@@ -13,20 +13,20 @@ jobs:
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v5
-      # - name: Set up Python
-      #   uses: actions/setup-python@v6
-      #   with:
-      #     python-version: '3.13'
-      # - name: Lint YAML files
-      #   uses: ibiqlik/action-yamllint@master
-      # - name: Run Ansible Lint
-      #   uses: ansible/ansible-lint@main
-      #   with:
-      #     setup_python: "false"
-      # - name: Run shellcheck
-      #   uses: ludeeus/action-shellcheck@master
-      #   with:
-      #     ignore_paths: .ansible
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Lint YAML files
+        uses: ibiqlik/action-yamllint@master
+      - name: Run Ansible Lint
+        uses: ansible/ansible-lint@main
+        with:
+          setup_python: "false"
+      - name: Run shellcheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          ignore_paths: .ansible
 
   integration_playbook:
     name: Integration tests for ansible playbook
@@ -53,7 +53,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run the tests
-        run: molecule test -- --tags homebrew,iterm2
+        run: molecule test
 
   integration_setup_script:
     name: Integration tests for setup script
