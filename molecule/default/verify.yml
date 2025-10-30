@@ -20,6 +20,10 @@
         brew_items: "{{ homebrew_installed_packages }}"
       tags: ["homebrew"]
 
+    - name: Verify Ruby setup
+      ansible.builtin.include_tasks: tasks/verify_ruby.yml
+      tags: ["ruby"]
+
     - name: Verify dotfiles
       ansible.builtin.include_tasks: tasks/verify_dotfiles.yml
       tags: ["dotfiles"]

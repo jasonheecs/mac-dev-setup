@@ -1,0 +1,37 @@
+---
+- name: Gather Ruby environment information
+  block:
+    - name: Check rbenv installation
+      ansible.builtin.command: rbenv --version
+      register: rbenv_version
+      changed_when: false
+
+    - name: Check ruby-build installation
+      ansible.builtin.command: brew list ruby-build
+      register: ruby_build_installed
+      changed_when: false
+
+    - name: Get latest Ruby version
+      ansible.builtin.shell: |
+        set -o pipefail
+        rbenv install -l | grep -v - | tail -1 | tr -d '[:space:]'
+      register: latest_ruby
+      changed_when: false
+
+    - name: Get installed Ruby versions
+      ansible.builtin.command: rbenv versions --bare
+      register: installed_rubies
+      changed_when: false
+
+- name: Assert Ruby environment is properly configured
+  ansible.builtin.assert:
+    that:
+      - rbenv_version.rc == 0
+      - ruby_build_installed.rc == 0
+      - latest_ruby.stdout in installed_rubies.stdout_lines
+    fail_msg: |
+      Ruby environment verification failed:
+      - rbenv installed: {{ rbenv_version.rc == 0 }}
+      - ruby-build installed: {{ ruby_build_installed.rc == 0 }}
+      - Latest Ruby ({{ latest_ruby.stdout }}) installed: {{ latest_ruby.stdout in installed_rubies.stdout_lines }}
+    success_msg: "Ruby environment is properly configured with latest version {{ latest_ruby.stdout }}"
