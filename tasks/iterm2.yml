@@ -69,22 +69,6 @@
     path: "{{ ansible_env.HOME }}/.iterm2_shell_integration.{{ user_shell }}"
   register: shell_integration
 
-- name: Debug ansible env home
-  ansible.builtin.debug:
-    var: ansible_env.HOME
-
-- name: Debug ansible env shell
-  ansible.builtin.debug:
-    var: user_shell
-
-- name: Debug ansible user home
-  ansible.builtin.command: ls -la
-  changed_when: false
-
-- name: Debug pwd
-  ansible.builtin.command: pwd
-  changed_when: false
-
 - name: Download shell integration script
   ansible.builtin.uri:
     url: https://iterm2.com/misc/install_shell_integration.sh
@@ -95,19 +79,11 @@
     - not shell_integration.stat.exists
     - shell_is_supported
 
-- name: Write shell integration script to temp file
-  ansible.builtin.copy:
-    content: "{{ shell_integration_script.content }}"
-    dest: /tmp/iterm2_shell_integration_install.sh
-    mode: '0755'
-  when:
-    - iterm2_stat.stat.exists
-    - not shell_integration.stat.exists
-    - shell_integration_script is defined
-    - shell_is_supported
-
 - name: Install shell integration
-  ansible.builtin.command: /bin/bash /tmp/iterm2_shell_integration_install.sh
+  ansible.builtin.shell: |
+    {{ shell_integration_script.content }}
+  args:
+    executable: /bin/bash
   register: shell_integration_result
   changed_when: shell_integration_result.rc == 0
   when:
@@ -115,26 +91,3 @@
     - not shell_integration.stat.exists
     - shell_integration_script is defined
     - shell_is_supported
-
-- name: Remove temp script
-  ansible.builtin.file:
-    path: /tmp/iterm2_shell_integration_install.sh
-    state: absent
-  when:
-    - iterm2_stat.stat.exists
-    - not shell_integration.stat.exists
-    - shell_integration_script is defined
-    - shell_is_supported
-
-# - name: Install shell integration
-#   ansible.builtin.shell: |
-#     {{ shell_integration_script.content }}
-#   args:
-#     executable: /bin/bash
-#   register: shell_integration_result
-#   changed_when: shell_integration_result.rc == 0
-#   when:
-#     - iterm2_stat.stat.exists
-#     - not shell_integration.stat.exists
-#     - shell_integration_script is defined
-#     - shell_is_supported
