@@ -1,0 +1,33 @@
+---
+- name: Gather Python environment information
+  block:
+    - name: Check pyenv installation
+      ansible.builtin.command: pyenv --version
+      register: pyenv_version
+      changed_when: false
+
+    - name: Get latest Python version
+      ansible.builtin.shell: |
+        set -o pipefail
+        pyenv install -l \
+          | grep -E '^\s*[0-9]+\.[0-9]+\.[0-9]+$' \
+          | tail -1 \
+          | tr -d '[:space:]'
+      register: latest_python
+      changed_when: false
+
+    - name: Get installed Python versions
+      ansible.builtin.command: pyenv versions --bare
+      register: installed_python_versions
+      changed_when: false
+
+- name: Assert Python environment is properly configured
+  ansible.builtin.assert:
+    that:
+      - pyenv_version.rc == 0
+      - latest_python.stdout in installed_python_versions.stdout_lines
+    fail_msg: |
+      Python environment verification failed:
+      - pyenv installed: {{ pyenv_version.rc == 0 }}
+      - Latest Python ({{ latest_python.stdout }}) installed: {{ latest_python.stdout in installed_python_versions.stdout_lines }}
+    success_msg: "Python environment is properly configured with latest version {{ latest_python.stdout }}"

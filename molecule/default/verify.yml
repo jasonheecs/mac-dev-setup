@@ -24,6 +24,10 @@
       ansible.builtin.include_tasks: tasks/verify_ruby.yml
       tags: ["ruby"]
 
+    - name: Verify Python setup
+      ansible.builtin.include_tasks: tasks/verify_python.yml
+      tags: ["python"]
+
     - name: Verify dotfiles
       ansible.builtin.include_tasks: tasks/verify_dotfiles.yml
       tags: ["dotfiles"]
