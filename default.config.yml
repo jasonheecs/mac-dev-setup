@@ -53,4 +53,4 @@ iterm2_fonts:
 iterm2_preferences_destination: ~/iterm2
 
 # Glob pattern to ansible task files to run after all other tasks are finished.
-post_provision_tasks: []
+post_provision_tasks: [tasks/post_provision/*.yml]
