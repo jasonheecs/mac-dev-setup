@@ -1,0 +1,54 @@
+---
+- name: Gather .osx file information
+  block:
+    - name: Set .osx file path
+      ansible.builtin.set_fact:
+        osx_file_path: "{{ dotfiles_repo_local_destination }}/.osx"
+
+    - name: Check .osx file status
+      ansible.builtin.stat:
+        path: "{{ osx_file_path }}"
+      register: osx_stat
+
+- name: Assert .osx file is properly configured
+  ansible.builtin.assert:
+    that:
+      - osx_stat.stat.exists
+      - osx_stat.stat.isreg
+      - osx_stat.stat.executable
+      - osx_stat.stat.size > 0
+    fail_msg: |
+      .osx file verification failed:
+      - File exists: {{ osx_stat.stat.exists }}
+      - Is regular file: {{ osx_stat.stat.isreg | default(false) }}
+      - Is executable: {{ osx_stat.stat.executable | default(false) }}
+      - Has content: {{ osx_stat.stat.size | default(0) > 0 }}
+    success_msg: ".osx file is properly configured at {{ osx_file_path }}"
+
+- name: Verify .osx file was executed
+  block:
+    - name: Check reduceTransparency setting
+      community.general.osx_defaults:
+        domain: com.apple.universalaccess
+        key: reduceTransparency
+        type: "string"
+        state: list
+      register: transparency_setting
+      changed_when: false
+      failed_when: false
+
+    - name: Check log file exists
+      ansible.builtin.stat:
+        path: /tmp/osx_setup.log
+      register: osx_log_stat
+
+- name: Assert macOS defaults were applied
+  ansible.builtin.assert:
+    that:
+      - transparency_setting.value == true
+      - osx_log_stat.stat.exists
+    fail_msg: |
+      macOS defaults verification failed:
+      - reduceTransparency setting: {{ transparency_setting.value }}
+      - Log file exists: {{ osx_log_stat.stat.exists }}
+    success_msg: "macOS defaults were applied by execution of .osx file"

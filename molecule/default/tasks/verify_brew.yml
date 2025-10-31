@@ -1,0 +1,17 @@
+---
+- name: Check if brew package is installed
+  ansible.builtin.command: >-
+    brew list {{ '--cask' if brew_type == 'cask' else '' }} {{ item }}
+  register: brew_checks
+  failed_when: false
+  changed_when: false
+  loop: "{{ brew_items }}"
+
+- name: Assert brew package is installed
+  ansible.builtin.assert:
+    that: item.rc == 0
+    fail_msg: "{{ brew_type | capitalize }} {{ item.item }} is not installed"
+    success_msg: "{{ brew_type | capitalize }} {{ item.item }} is installed"
+  loop: "{{ brew_checks.results }}"
+  loop_control:
+    label: "{{ item.item }}"

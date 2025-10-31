@@ -1,0 +1,52 @@
+---
+- name: Verify system setup
+  hosts: all
+  connection: local
+  gather_facts: false
+  vars_files: ../../default.config.yml
+
+  pre_tasks:
+    - name: Include main playbook configuration
+      ansible.builtin.include_vars: "{{ item }}"
+      with_fileglob:
+        - "{{ playbook_dir }}/../../config.yml"
+      tags: ["always"]
+
+  tasks:
+    - name: Verify Homebrew casks
+      ansible.builtin.include_tasks: tasks/verify_brew.yml
+      vars:
+        brew_type: cask
+        brew_items: "{{ homebrew_cask_apps }}"
+      tags: ["homebrew"]
+
+    - name: Verify Homebrew packages
+      ansible.builtin.include_tasks: tasks/verify_brew.yml
+      vars:
+        brew_type: formula
+        brew_items: "{{ homebrew_installed_packages }}"
+      tags: ["homebrew"]
+
+    - name: Verify Ruby setup
+      ansible.builtin.include_tasks: tasks/verify_ruby.yml
+      tags: ["ruby"]
+
+    - name: Verify Python setup
+      ansible.builtin.include_tasks: tasks/verify_python.yml
+      tags: ["python"]
+
+    - name: Verify Node.js setup
+      ansible.builtin.include_tasks: tasks/verify_node.yml
+      tags: ["node"]
+
+    - name: Verify dotfiles
+      ansible.builtin.include_tasks: tasks/verify_dotfiles.yml
+      tags: ["dotfiles"]
+
+    - name: Verify setting of macOS defaults
+      ansible.builtin.include_tasks: tasks/verify_macos.yml
+      tags: ["macos"]
+
+    - name: Verify iTerm2 setup
+      ansible.builtin.include_tasks: tasks/verify_iterm2.yml
+      tags: ["iterm2"]

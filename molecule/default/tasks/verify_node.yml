@@ -1,0 +1,50 @@
+---
+- name: Gather Node.js environment information
+  block:
+    - name: Check fnm installation
+      ansible.builtin.command: fnm --version
+      register: fnm_version
+      changed_when: false
+
+    - name: Get latest LTS Node version
+      ansible.builtin.shell: |
+        set -o pipefail
+        fnm ls-remote --lts | tail -1 | awk '{print $1}'
+      register: latest_lts
+      changed_when: false
+
+    - name: Get installed Node versions
+      ansible.builtin.command: fnm list
+      register: installed_versions
+      changed_when: false
+
+    - name: Get current default version
+      ansible.builtin.shell: |
+        set -o pipefail
+        eval "$(fnm env)"
+        fnm current
+      register: current_version
+      changed_when: false
+
+    - name: Test Node execution
+      ansible.builtin.shell: |
+        set -o pipefail
+        eval "$(fnm env)"
+        node --version
+      register: node_execution
+      changed_when: false
+
+- name: Assert Node.js environment is properly configured
+  ansible.builtin.assert:
+    that:
+      - fnm_version.rc == 0
+      - latest_lts.stdout in installed_versions.stdout
+      - current_version.stdout.strip() == latest_lts.stdout.strip()
+      - node_execution.rc == 0
+    fail_msg: |
+      Node environment verification failed:
+      - fnm installed: {{ fnm_version.rc == 0 }}
+      - Latest LTS ({{ latest_lts.stdout }}) installed: {{ latest_lts.stdout in installed_versions.stdout }}
+      - Default version correct: {{ current_version.stdout.strip() == latest_lts.stdout.strip() }}
+      - Node executable: {{ node_execution.rc == 0 }}
+    success_msg: "Node.js environment is properly configured with latest version {{ latest_lts.stdout }}"

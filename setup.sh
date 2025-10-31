@@ -140,7 +140,7 @@ run_ansible_playbook() {
         log_error "main.yml not found in current directory"
         return 1
     fi
-    
+
     log_info "Running Ansible playbook..."
     ansible-playbook ./main.yml
 }

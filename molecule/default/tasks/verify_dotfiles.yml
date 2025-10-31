@@ -1,0 +1,17 @@
+---
+- name: Check if dotfiles are present
+  ansible.builtin.stat:
+    path: "{{ dotfiles_home }}/{{ item }}"
+  register: dotfile_checks
+  loop: "{{ dotfiles_files }}"
+
+- name: Assert dotfiles are symlinks
+  ansible.builtin.assert:
+    that:
+      - item.stat.exists
+      - item.stat.islnk
+    fail_msg: "File {{ item.item }} is not a symlink"
+    success_msg: "File {{ item.item }} is a symlink to {{ item.stat.lnk_source }}"
+  loop: "{{ dotfile_checks.results }}"
+  loop_control:
+    label: "{{ item.item }}"

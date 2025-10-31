@@ -56,9 +56,17 @@
     - iterm2_stat.stat.exists
     - iterm2_preferences_destination | default('') | length > 0
 
+- name: Determine user shell
+  ansible.builtin.set_fact:
+    user_shell: "{{ ansible_env.SHELL | basename }}"
+
+- name: Check if current shell is supported
+  ansible.builtin.set_fact:
+    shell_is_supported: "{{ user_shell in ['bash', 'zsh', 'fish', 'tcsh'] }}"
+
 - name: Check if shell integration is already installed
   ansible.builtin.stat:
-    path: "{{ ansible_env.HOME }}/.iterm2_shell_integration.zsh"
+    path: "{{ ansible_env.HOME }}/.iterm2_shell_integration.{{ user_shell }}"
   register: shell_integration
 
 - name: Download shell integration script
@@ -69,9 +77,11 @@
   when:
     - iterm2_stat.stat.exists
     - not shell_integration.stat.exists
+    - shell_is_supported
 
 - name: Install shell integration
-  ansible.builtin.shell: "{{ shell_integration_script.content }}"
+  ansible.builtin.shell: |
+    {{ shell_integration_script.content }}
   args:
     executable: /bin/bash
   register: shell_integration_result
@@ -80,3 +90,4 @@
     - iterm2_stat.stat.exists
     - not shell_integration.stat.exists
     - shell_integration_script is defined
+    - shell_is_supported
