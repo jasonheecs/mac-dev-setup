@@ -28,6 +28,10 @@
       ansible.builtin.include_tasks: tasks/verify_python.yml
       tags: ["python"]
 
+    - name: Verify Node.js setup
+      ansible.builtin.include_tasks: tasks/verify_node.yml
+      tags: ["node"]
+
     - name: Verify dotfiles
       ansible.builtin.include_tasks: tasks/verify_dotfiles.yml
       tags: ["dotfiles"]
