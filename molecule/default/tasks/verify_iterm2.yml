@@ -1,0 +1,70 @@
+---
+- name: Gather iTerm2 information
+  block:
+    - name: Check iTerm2 installation
+      ansible.builtin.stat:
+        path: "/Applications/iTerm.app"
+      register: iterm2_app
+
+    - name: Check preferences plist
+      ansible.builtin.stat:
+        path: "{{ iterm2_preferences_destination }}/com.googlecode.iterm2.plist"
+      register: prefs_plist
+
+    - name: Check fonts installation
+      ansible.builtin.stat:
+        path: "{{ lookup('env', 'HOME') }}/Library/Fonts/{{ item | basename }}"
+      loop: "{{ iterm2_fonts | default([]) }}"
+      register: fonts_installed
+
+    - name: Get PrefsCustomFolder setting
+      community.general.osx_defaults:
+        domain: com.googlecode.iterm2
+        key: PrefsCustomFolder
+        type: "string"
+        state: list
+      register: prefs_custom_folder
+      changed_when: false
+      failed_when: false
+
+    - name: Get LoadPrefsFromCustomFolder setting
+      community.general.osx_defaults:
+        domain: com.googlecode.iterm2
+        key: LoadPrefsFromCustomFolder
+        type: "string"
+        state: list
+      register: load_prefs
+      changed_when: false
+      failed_when: false
+
+    - name: Check shell integration
+      ansible.builtin.stat:
+        path: "{{ lookup('env', 'HOME') }}/.iterm2_shell_integration.{{ lookup('env', 'SHELL') | basename }}"
+      register: shell_integration
+
+- name: Assert iTerm2 is properly configured
+  ansible.builtin.assert:
+    that:
+      - iterm2_app.stat.exists
+      - prefs_plist.stat.exists and prefs_plist.stat.size > 0
+      - prefs_custom_folder.value == iterm2_preferences_destination
+      - load_prefs.value == true
+      - shell_integration.stat.exists
+    fail_msg: |
+      iTerm2 configuration verification failed:
+      - iTerm2 installed: {{ iterm2_app.stat.exists }}
+      - Preferences plist: {{ prefs_plist.stat.exists | default(false) }}
+      - PrefsCustomFolder: {{ prefs_custom_folder.stdout | default('not set') }}
+      - LoadPrefsFromCustomFolder: {{ load_prefs.stdout | default('not set') }}
+      - Shell integration: {{ shell_integration.stat.exists | default(false) }}
+    success_msg: "iTerm2 is fully configured with custom preferences and shell integration"
+
+- name: Assert all fonts are installed
+  ansible.builtin.assert:
+    that:
+      - fonts_installed.results | selectattr('stat.exists') | list | length == iterm2_fonts | length
+    fail_msg: "Not all fonts are installed"
+    success_msg: "All {{ iterm2_fonts | length }} fonts are installed"
+  when:
+    - iterm2_fonts is defined
+    - iterm2_fonts | length > 0

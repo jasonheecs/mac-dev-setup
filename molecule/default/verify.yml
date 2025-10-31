@@ -46,3 +46,7 @@
     - name: Verify setting of macOS defaults
       ansible.builtin.include_tasks: tasks/verify_macos.yml
       tags: ["macos"]
+
+    - name: Verify iTerm2 setup
+      ansible.builtin.include_tasks: tasks/verify_iterm2.yml
+      tags: ["iterm2"]
