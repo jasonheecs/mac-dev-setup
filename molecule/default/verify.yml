@@ -29,24 +29,30 @@
 
     - name: Verify Ruby setup
       ansible.builtin.include_tasks: tasks/verify_ruby.yml
+      when: configure_ruby | default(false)
       tags: ["ruby"]
 
     - name: Verify Python setup
       ansible.builtin.include_tasks: tasks/verify_python.yml
+      when: configure_python | default(false)
       tags: ["python"]
 
     - name: Verify Node.js setup
       ansible.builtin.include_tasks: tasks/verify_node.yml
+      when: configure_node | default(false)
       tags: ["node"]
 
     - name: Verify dotfiles
       ansible.builtin.include_tasks: tasks/verify_dotfiles.yml
+      when: configure_dotfiles | default(false)
       tags: ["dotfiles"]
 
     - name: Verify setting of macOS defaults
       ansible.builtin.include_tasks: tasks/verify_macos.yml
+      when: configure_dotfiles | default(false)
       tags: ["macos"]
 
     - name: Verify iTerm2 setup
       ansible.builtin.include_tasks: tasks/verify_iterm2.yml
+      when: configure_iterm2 | default(false)
       tags: ["iterm2"]

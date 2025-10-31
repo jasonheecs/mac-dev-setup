@@ -57,6 +57,7 @@
   tasks:
     - name: Configure macOS
       ansible.builtin.import_tasks: tasks/macos.yml
+      when: configure_dotfiles | default(false)
       tags: ["macos"]
 
     - name: Configure iterm2
