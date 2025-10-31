@@ -4,7 +4,7 @@ name: CI
   pull_request:
     branches: [master]
   push:
-    branches: [master, molecule]
+    branches: [master]
 
 jobs:
   lint:
