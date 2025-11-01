@@ -1,10 +1,11 @@
 ---
 - name: Gather iTerm2 information
   block:
-    - name: Check iTerm2 installation
-      ansible.builtin.stat:
-        path: "/Applications/iTerm.app"
-      register: iterm2_app
+    - name: Check iTerm2 is installed via Homebrew
+      ansible.builtin.command: brew list iterm2
+      register: iterm2_brew_check
+      failed_when: false
+      changed_when: false
 
     - name: Check preferences plist
       ansible.builtin.stat:
@@ -45,14 +46,14 @@
 - name: Assert iTerm2 is properly configured
   ansible.builtin.assert:
     that:
-      - iterm2_app.stat.exists
+      - iterm2_brew_check.rc == 0
       - prefs_plist.stat.exists and prefs_plist.stat.size > 0
       - prefs_custom_folder.value == iterm2_preferences_destination
       - load_prefs.value == true
       - shell_integration.stat.exists
     fail_msg: |
       iTerm2 configuration verification failed:
-      - iTerm2 installed: {{ iterm2_app.stat.exists }}
+      - iTerm2 installed: {{ iterm2_brew_check.rc == 0 }}
       - Preferences plist: {{ prefs_plist.stat.exists | default(false) }}
       - PrefsCustomFolder: {{ prefs_custom_folder.stdout | default('not set') }}
       - LoadPrefsFromCustomFolder: {{ load_prefs.stdout | default('not set') }}

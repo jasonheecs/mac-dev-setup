@@ -1,8 +1,8 @@
 ---
-- name: Ensure iterm2 is installed
-  ansible.builtin.stat:
-    path: "/Applications/iTerm.app"
-  register: iterm2_stat
+- name: Ensure iterm2 is installed via homebrew
+  community.general.homebrew:
+    name: iterm2
+    state: present
 
 - name: Ensure iterm2 preferences folder exists
   ansible.builtin.file:
@@ -10,7 +10,6 @@
     state: directory
     mode: "0755"
   when:
-    - iterm2_stat.stat.exists
     - iterm2_preferences_destination is defined
 
 - name: Copy iterm2 preferences file
@@ -19,7 +18,6 @@
     dest: "{{ iterm2_preferences_destination }}/com.googlecode.iterm2.plist"
     mode: "0644"
     force: false
-  when: iterm2_stat.stat.exists
 
 - name: Ensure Fonts directory exists
   ansible.builtin.file:
@@ -34,7 +32,6 @@
     mode: "0644"
   loop: "{{ iterm2_fonts }}"
   when:
-    - iterm2_stat.stat.exists
     - iterm2_fonts is defined
     - iterm2_fonts | length > 0
 
@@ -53,7 +50,6 @@
       type: "bool"
       value: true
   when:
-    - iterm2_stat.stat.exists
     - iterm2_preferences_destination | default('') | length > 0
 
 - name: Determine user shell
@@ -75,7 +71,6 @@
     return_content: true
   register: shell_integration_script
   when:
-    - iterm2_stat.stat.exists
     - not shell_integration.stat.exists
     - shell_is_supported
 
@@ -87,7 +82,6 @@
   register: shell_integration_result
   changed_when: shell_integration_result.rc == 0
   when:
-    - iterm2_stat.stat.exists
     - not shell_integration.stat.exists
     - shell_integration_script is defined
     - shell_is_supported
