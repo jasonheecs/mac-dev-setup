@@ -1,0 +1,40 @@
+---
+- name: Check if zimfw is installed via Homebrew
+  ansible.builtin.command: brew list zimfw
+  register: zimfw_brew_check
+  failed_when: false
+  changed_when: false
+
+- name: Assert zimfw is installed
+  ansible.builtin.assert:
+    that: zimfw_brew_check.rc == 0
+    fail_msg: "zimfw is not installed via Homebrew"
+    success_msg: "zimfw is installed via Homebrew"
+
+- name: Set ZIM_HOME to default location
+  ansible.builtin.set_fact:
+    zim_home: "{{ ansible_env.HOME }}/.zim"
+
+- name: Check zimfw installation files
+  ansible.builtin.stat:
+    path: "{{ zim_home }}/{{ item }}"
+  register: zimfw_files
+  loop:
+    - init.zsh
+    - modules
+
+- name: Assert zimfw files exist
+  ansible.builtin.assert:
+    that: item.stat.exists
+    fail_msg: "Required zimfw file {{ item.item }} does not exist"
+    success_msg: "zimfw file {{ item.item }} exists"
+  loop: "{{ zimfw_files.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+
+- name: Verify zimfw command is available
+  ansible.builtin.shell: >
+    /usr/local/bin/zsh -c
+    "source ~/.zshrc 2>/dev/null &&
+    zimfw version"
+  changed_when: false
