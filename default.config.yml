@@ -4,6 +4,7 @@ configure_iterm2: true
 configure_node: true
 configure_python: true
 configure_ruby: true
+configure_zimfw: true
 
 # dotfiles configuration
 dotfiles_repo: "https://github.com/jasonheecs/dotfiles.git"

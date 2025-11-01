@@ -65,6 +65,11 @@
       when: configure_iterm2 | default(false)
       tags: ["iterm2"]
 
+    - name: Configure zimfw
+      ansible.builtin.import_tasks: tasks/zimfw.yml
+      when: configure_zimfw | default(false)
+      tags: ["zimfw"]
+
   post_tasks:
     - name: Get list of directories with permission issues for ZSH compinit
       ansible.builtin.shell: compaudit 2>/dev/null || true
