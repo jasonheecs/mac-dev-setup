@@ -21,13 +21,20 @@
       register: installed_python_versions
       changed_when: false
 
+    - name: Verify Python lzma module is available
+      ansible.builtin.command: python -c "import lzma"
+      changed_when: false
+      register: python_lzma_check
+
 - name: Assert Python environment is properly configured
   ansible.builtin.assert:
     that:
       - pyenv_version.rc == 0
       - latest_python.stdout in installed_python_versions.stdout_lines
+      - python_lzma_check.rc == 0
     fail_msg: |
       Python environment verification failed:
       - pyenv installed: {{ pyenv_version.rc == 0 }}
       - Latest Python ({{ latest_python.stdout }}) installed: {{ latest_python.stdout in installed_python_versions.stdout_lines }}
+      - Python has lzma library: {{ python_lzma_check.rc == 0 }}
     success_msg: "Python environment is properly configured with latest version {{ latest_python.stdout }}"

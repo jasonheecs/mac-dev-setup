@@ -1,7 +1,7 @@
 ---
-- name: Make sure pyenv is installed
+- name: Ensure pyenv and dependencies are installed
   community.general.homebrew:
-    name: pyenv
+    name: [pyenv, readline, xz]
     state: present
 
 - name: Get latest available stable Python version
@@ -20,12 +20,53 @@
   changed_when: false
   failed_when: false
 
-- name: Install latest Python version via pyenv
-  ansible.builtin.command:
-    pyenv install "{{ python_latest_version.stdout }}" --skip-existing
-  when: python_current_version.stdout != python_latest_version.stdout
+- name: Get installed Python versions
+  ansible.builtin.command: pyenv versions --bare
+  register: python_installed_versions
+  changed_when: false
+
+- name: Check if latest version is already installed
+  ansible.builtin.set_fact:
+    python_latest_installed: "{{ python_latest_version.stdout in python_installed_versions.stdout_lines }}"
+
+  # https://stackoverflow.com/questions/76028283/missing-the-lzma-lib/76310848#comment134092700_76028283
+- name: Check if installed Python has lzma support
+  ansible.builtin.command: >
+    {{ ansible_env.HOME }}/.pyenv/versions/{{ python_latest_version.stdout }}/bin/python
+    -c "import lzma"
+  register: python_lzma_check
+  changed_when: false
+  failed_when: false
+  when: python_latest_installed | bool
+
+- name: Determine if Python needs installation
+  ansible.builtin.set_fact:
+    python_needs_installation: >-
+      {{
+        not python_latest_installed or
+        (python_lzma_check.rc is defined and python_lzma_check.rc != 0)
+      }}
+
+- name: Uninstall Python version if lzma is missing
+  ansible.builtin.command: pyenv uninstall -f "{{ python_latest_version.stdout }}"
+  environment:
+    LC_ALL: C
+    LANG: C
+  when:
+    - python_needs_installation | bool
+    - python_latest_installed | bool
+    - python_lzma_check.rc != 0
+  register: python_uninstall
   changed_when: true
-  register: python_install
+
+- name: Install latest Python version via pyenv
+  ansible.builtin.command: pyenv install "{{ python_latest_version.stdout }}"
+  when: python_needs_installation | bool
+  changed_when: true
+  environment:
+    # Ensure Python is compiled with xz/lzma support
+    PYTHON_CONFIGURE_OPTS: "--enable-loadable-sqlite-extensions"
+  register: python_install_result
 
 - name: Set global Python version to latest
   ansible.builtin.command: pyenv global "{{ python_latest_version.stdout }}"
