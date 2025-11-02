@@ -56,3 +56,8 @@
       ansible.builtin.include_tasks: tasks/verify_iterm2.yml
       when: configure_iterm2 | default(false)
       tags: ["iterm2"]
+
+    - name: Verify zimfw setup
+      ansible.builtin.include_tasks: tasks/verify_zimfw.yml
+      when: configure_zimfw | default(false)
+      tags: ["zimfw"]

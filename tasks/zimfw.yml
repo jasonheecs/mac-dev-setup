@@ -1,0 +1,42 @@
+---
+- name: Ensure zimfw is installed
+  community.general.homebrew:
+    name: zimfw
+    state: present
+
+- name: Set ZIM_HOME to default location
+  ansible.builtin.set_fact:
+    zim_home: "{{ ansible_env.HOME }}/.zim"
+
+- name: Check if zimfw modules are installed
+  ansible.builtin.stat:
+    path: "{{ zim_home }}/init.zsh"
+  register: zimfw_init
+
+- name: Get stats of zimrc file
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.zimrc"
+  register: zimrc_stat
+  changed_when: false
+
+- name: Check if zimfw modules needs installation
+  ansible.builtin.set_fact:
+    zimfw_needs_install: >-
+      {{
+        not zimfw_init.stat.exists or
+        (zimfw_init.stat.exists and
+         zimrc_stat.stat.exists and
+         zimrc_stat.stat.mtime > zimfw_init.stat.mtime)
+      }}
+  changed_when: false
+
+- name: Install zimfw modules
+  ansible.builtin.shell: |
+    source $(brew --prefix)/opt/zimfw/share/zimfw.zsh init
+    zimfw install
+  args:
+    executable: /bin/zsh
+  when: zimfw_needs_install | bool
+  changed_when: true
+  environment:
+    ZIM_HOME: "{{ zim_home }}"
