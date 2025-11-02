@@ -15,20 +15,28 @@
 
 - name: Get stats of zimrc file
   ansible.builtin.stat:
-    path: "{{ zim_home }}/.zimrc"
+    path: "{{ ansible_env.HOME }}/.zimrc"
   register: zimrc_stat
+  changed_when: false
+
+- name: Check if zimfw modules needs installation
+  ansible.builtin.set_fact:
+    zimfw_needs_install: >-
+      {{
+        not zimfw_init.stat.exists or
+        (zimfw_init.stat.exists and
+         zimrc_stat.stat.exists and
+         zimrc_stat.stat.mtime > zimfw_init.stat.mtime)
+      }}
   changed_when: false
 
 - name: Install zimfw modules
   ansible.builtin.shell: |
     source $(brew --prefix)/opt/zimfw/share/zimfw.zsh init
     zimfw install
-  when:
-    - not zimfw_init.stat.exists
-    - zimrc_stat.stat.exists
-    - zimrc_stat.stat.mtime <  zimfw_init.stat.mtime
+  args:
+    executable: /bin/zsh
+  when: zimfw_needs_install | bool
   changed_when: true
   environment:
     ZIM_HOME: "{{ zim_home }}"
-    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
-  debugger: on_failed

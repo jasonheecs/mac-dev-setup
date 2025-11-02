@@ -13,7 +13,7 @@
 
 - name: Set ZIM_HOME to default location
   ansible.builtin.set_fact:
-    zim_home: "{{ ansible_env.HOME }}/.zim"
+    zim_home: "{{ lookup('env', 'HOME') }}/.zim"
 
 - name: Check zimfw installation files
   ansible.builtin.stat:
@@ -33,8 +33,11 @@
     label: "{{ item.item }}"
 
 - name: Verify zimfw command is available
-  ansible.builtin.shell: >
-    /usr/local/bin/zsh -c
-    "source ~/.zshrc 2>/dev/null &&
-    zimfw version"
+  ansible.builtin.shell: |
+    source $(brew --prefix)/opt/zimfw/share/zimfw.zsh init &&
+    zimfw version
+  args:
+    executable: /bin/zsh
+  environment:
+    ZIM_HOME: "{{ zim_home }}"
   changed_when: false
