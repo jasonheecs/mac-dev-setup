@@ -89,6 +89,11 @@ get_latest_python_version() {
     echo "$python_version"
 }
 
+# https://stackoverflow.com/questions/76028283/missing-the-lzma-lib/76310848
+install_python_dependencies() {
+    brew install readline xz
+}
+
 setup_pyenv() {
     if command -v pyenv &>/dev/null; then
         log_info "pyenv already installed"
@@ -97,6 +102,8 @@ setup_pyenv() {
 
     log_info "Setup PyEnv..."
     brew install pyenv
+
+    install_python_dependencies
 
     local python_version
     if ! python_version=$(get_latest_python_version); then
