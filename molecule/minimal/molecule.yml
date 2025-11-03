@@ -1,0 +1,52 @@
+---
+# This scenario sets all configuration flags to off and
+# verifies that they work in the playbook as expected.
+
+dependency:
+  name: galaxy
+  options:
+    ignore-certs: false
+    ignore-errors: false
+    role-file: ../../requirements.yml
+    requirements-file: ../../requirements.yml
+
+
+ansible:
+  cfg:
+    defaults:
+      host_key_checking: false
+      verbosity: 1
+    ssh_connection:
+      pipelining: true
+
+  env:
+    ANSIBLE_FORCE_COLOR: "1"
+    ANSIBLE_LOAD_CALLBACK_PLUGINS: "1"
+
+  executor:
+    backend: ansible-playbook
+    args:
+      ansible_playbook:
+        - --diff
+        - --force-handlers
+        - --inventory=inventory.ini
+        - --extra-vars=@vars/config.yml
+      ansible_navigator:
+        - --mode stdout
+        - --pull-policy missing
+        - --execution-environment-image ghcr.io/ansible/community-ansible-dev-tools:latest
+
+  playbooks:
+    converge: converge.yml
+    verify: verify.yml
+
+scenario:
+  name: minimal
+  converge_sequence:
+    - converge
+
+  test_sequence:
+    - syntax
+    - converge
+    - idempotence
+    - verify

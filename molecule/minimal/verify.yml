@@ -1,0 +1,36 @@
+---
+- name: Verify system setup
+  hosts: all
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Verify dotfiles directory does not exist
+      ansible.builtin.stat:
+        path: "~/.dotfiles"
+      register: dotfiles_directory_status
+
+    - name: Assert that dotfiles were not configured
+      ansible.builtin.assert:
+        that:
+          - not dotfiles_directory_status.stat.exists
+        fail_msg: |
+          Dotfiles verification failed:
+          - dotfiles directory exists: {{ dotfiles_directory_status.stat.exists }}
+        success_msg: "dotfiles not configured"
+
+    - name: Verify that brew packages were not installed
+      ansible.builtin.command: >
+        brew list fnm iterm2 pyenv rbenv zimfw
+      register: brew_packages_check
+      failed_when: false
+      changed_when: false
+
+    - name: Assert brew packages were not installed
+      ansible.builtin.assert:
+        that:
+          - brew_packages_check.rc != 0
+        fail_msg: |
+          Packages should not be installed: {{ brew_packages_check.rc != 0 }}
+        success_msg: |
+          Packages are correctly not installed
