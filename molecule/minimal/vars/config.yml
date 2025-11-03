@@ -1,0 +1,12 @@
+---
+configure_dotfiles: false
+configure_iterm2: false
+configure_node: false
+configure_python: false
+configure_ruby: false
+configure_zimfw: false
+
+homebrew_installed_packages: []
+homebrew_cask_apps: []
+
+dotfiles_repo_local_destination: "~/.dotfiles"

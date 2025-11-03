@@ -53,7 +53,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run the tests
-        run: molecule test
+        run: molecule test -s default
 
   integration_setup_script:
     name: Integration tests for setup script
@@ -71,3 +71,22 @@ jobs:
 
       - name: Run the setup script
         run: ./setup.sh
+
+  integration_minimal_playbook:
+    name: Integration tests for ansible playbook when configuration flags are off
+    runs-on: macos-latest
+    needs: lint
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install test dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run the tests
+        run: molecule test -s minimal
