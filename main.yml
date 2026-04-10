@@ -32,12 +32,6 @@
     - role: geerlingguy.mac.homebrew
       tags: ["homebrew"]
 
-    - role: geerlingguy.mac.mas
-      when: >
-        (mas_installed_apps | default([]) | length > 0) or
-        (mas_installed_app_ids | default([]) | length > 0)
-      tags: ["mas"]
-
     - role: ruby
       when: configure_ruby | default(false)
       tags: ["ruby"]
@@ -59,6 +53,13 @@
       ansible.builtin.import_tasks: tasks/macos.yml
       when: configure_dotfiles | default(false)
       tags: ["macos"]
+
+    - name: Configure Mac App Store apps
+      ansible.builtin.import_tasks: tasks/mas.yml
+      when: >
+        (mas_installed_apps | default([]) | length > 0) or
+        (mas_installed_app_ids | default([]) | length > 0)
+      tags: ["mas"]
 
     - name: Configure iterm2
       ansible.builtin.import_tasks: tasks/iterm2.yml
