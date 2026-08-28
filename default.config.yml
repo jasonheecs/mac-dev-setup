@@ -22,6 +22,7 @@ dotfiles_files:
   - .vimrc
   - .zimrc
   - .zshrc
+  - .claude/CLAUDE.md
 
 # Homebrew configuration
 homebrew_installed_packages:
