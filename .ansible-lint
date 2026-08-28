@@ -1,0 +1,6 @@
+---
+# Third-party roles and collections are installed into .ansible/ by the lint
+# action itself; their violations are not ours to fix. Mirrors the shellcheck
+# step's ignore_paths in .github/workflows/ci.yml.
+exclude_paths:
+  - .ansible/
