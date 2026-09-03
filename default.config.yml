@@ -13,10 +13,12 @@ dotfiles_repo_local_destination: "~/.dotfiles"
 dotfiles_home: "~"
 dotfiles_files:
   - .aliases
+  - .claude/CLAUDE.md
   - .gitaliases
   - .gitconfig
   - .gitignore
   - .osx
+  - .tmux.conf
   - .vimrc
   - .zimrc
   - .zshrc
